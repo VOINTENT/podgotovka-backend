@@ -9,7 +9,7 @@ from src.internal.drivers.async_pg import AsyncPg
 
 class BaseDao(ABC):
     def __init__(self, conn: Optional[Connection] = None) -> None:
-        self.__pool: Pool = AsyncPg.get_pool_log_db()
+        self.__pool: Pool = AsyncPg.get_pool_primary_db()
         self.__conn = conn
 
     async def _get_connection_from_pool(self) -> Connection:

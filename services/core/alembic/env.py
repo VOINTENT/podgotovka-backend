@@ -15,10 +15,10 @@ target_metadata = metadata
 
 def get_url():
     return "postgresql://%s:%s@%s/%s" % (
-        os.getenv("ONELINKS_DB_USER", "postgres"),
-        os.getenv("ONELINKS_DB_PASSWORD", "root"),
-        os.getenv("ONELINKS_DB_HOST", "127.0.0.1"),
-        os.getenv("ONELINKS_PRIMARY_DB_NAME", "podgotovka_primary"),
+        os.getenv("PODGOTOVKA_DB_USER", "postgres"),
+        os.getenv("PODGOTOVKA_DB_PASSWORD", "root"),
+        os.getenv("PODGOTOVKA_DB_HOST", "127.0.0.1"),
+        os.getenv("PODGOTOVKA_PRIMARY_DB_NAME", "podgotovka_primary"),
     )
 
 

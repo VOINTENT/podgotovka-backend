@@ -22,5 +22,11 @@ async def _run(query: str, *args):
 
 def truncate_tables():
     run_query("""
-        TRUNCATE TABLE test
+        TRUNCATE TABLE account_teacher
     """)
+
+
+def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+    run_query("""
+        INSERT INTO account_teacher(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
+    """, id, edited_at, email, name, hash_password)

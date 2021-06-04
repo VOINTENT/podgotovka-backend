@@ -1,0 +1,3 @@
+FILES_LINK = 'some-link'
+SECRET_KEY = 'qwerty123'
+ENCRYPT_ALGORITHM = 'HS256'
