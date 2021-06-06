@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
+from src.internal.biz.entities.request.homeworks.add import HomeworkAddRequest
 from src.internal.biz.entities.request.test_question.answer import TestQuestionAnswerRequest
 from src.internal.biz.entities.response.homework.detail_with_results import HomeworkDetailWithResultsResponse
 from src.internal.biz.entities.response.test_question.result.after_answer import TestQuestionResultAfterAnswerResponse
@@ -16,6 +17,11 @@ homeworks_router = APIRouter(prefix='/homeworks', tags=['Homeworks'])
 async def get_homework_detail(
         homework_id: int,
         current_account_student: Optional[AccountStudent] = Depends(get_optional_current_account_student)):
+    pass
+
+
+@homeworks_router.post('/', response_model=bool)
+async def create_homework(homework_request: HomeworkAddRequest):
     pass
 
 

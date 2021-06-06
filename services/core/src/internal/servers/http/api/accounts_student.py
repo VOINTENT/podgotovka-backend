@@ -5,7 +5,7 @@ from src.internal.biz.entities.request.account.student.add import AccountStudent
 from src.internal.biz.entities.request.auth.vk_code import VkCodeRequest
 from src.internal.biz.entities.response.account.token import TokenResponse
 
-accounts_student_router = APIRouter(prefix='/accounts-student')
+accounts_student_router = APIRouter(prefix='/accounts-student', tags=['Student Accounts'])
 
 
 @accounts_student_router.post('/register', response_model=TokenResponse)

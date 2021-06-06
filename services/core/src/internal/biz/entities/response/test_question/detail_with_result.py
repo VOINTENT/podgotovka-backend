@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import Field
 
@@ -12,7 +12,7 @@ from src.internal.biz.entities.response.test_question.result.previous import Tes
 class TestQuestionDetailWithResultResponse(BaseResponseModel):
     question_text: str = Field(..., example='String in JSON format')
     answer_type: AnswerTypeEnum = Field(..., example='one')
-    answer_variants: List[AnswerVariantSimpleResponse]
+    answer_variants: Optional[List[AnswerVariantSimpleResponse]] = Field(None, min_items=1)
     total_count_attempts: int = Field(..., example=3)
     available_count_attempts: int = Field(..., example=2)
     used_prompts: List[PromptSimpleResponse]
