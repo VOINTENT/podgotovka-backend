@@ -6,8 +6,9 @@ from fastapi import APIRouter, Depends
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.enum.order import OrderEnum
-from src.internal.biz.entities.request.lesson.add import LessonAddRequest
+from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.biz.entities.response.lesson.detail import LessonDetailResponse
+from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
 from src.internal.biz.entities.response.lesson.simple_with_counts import LessonSimpleListWithCountsResponse
 from src.internal.servers.http.depends.auth import get_current_account_student, get_optional_current_account_student, \
     get_current_account_teacher
@@ -27,8 +28,8 @@ async def get_lessons(date_start: datetime = Depends(get_date_start),
 
 
 @lessons_router.get('/my/teachers', response_model=LessonSimpleListWithCountsResponse)
-async def get_my_student_lessons(
-        account_student: AccountStudent = Depends(get_current_account_student),
+async def get_my_teacher_lessons(
+        account_teacher: AccountTeacher = Depends(get_current_account_teacher),
         date_start: datetime = Depends(get_date_start),
         pagination_params: PaginationParams = Depends(),
         order: OrderEnum = Depends(get_order),
@@ -38,8 +39,8 @@ async def get_my_student_lessons(
 
 
 @lessons_router.get('/my/students', response_model=LessonSimpleListWithCountsResponse)
-async def get_my_teacher_lessons(
-        account_teacher: AccountStudent = Depends(get_current_account_teacher),
+async def get_my_student_lessons(
+        account_student: AccountStudent = Depends(get_current_account_student),
         date_start: datetime = Depends(get_date_start),
         pagination_params: PaginationParams = Depends(),
         order: OrderEnum = Depends(get_order),
@@ -49,7 +50,7 @@ async def get_my_teacher_lessons(
     pass
 
 
-@lessons_router.get('/{lesson_id}', response_model=LessonDetailResponse)
+@lessons_router.get('/{lesson_id}', response_model=LessonDetailForStudentResponse)
 async def get_lesson_detail(
         lesson_id: int,
         current_account_student: Optional[AccountStudent] = Depends(get_optional_current_account_student)):
@@ -73,7 +74,12 @@ async def unsubscribe_to_subject_and_course(lesson_id: int,
     pass
 
 
-@lessons_router.post('/')
-async def lesson_create(lesson_request: LessonAddRequest,
+@lessons_router.post('/', response_model=LessonDetailForStudentResponse)
+async def lesson_create(account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
+    pass
+
+
+@lessons_router.patch('/{lesson_id}', response_model=LessonDetailResponse)
+async def lesson_update(lesson_id: int, lesson_request: LessonUpdateRequest,
                         account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
     pass

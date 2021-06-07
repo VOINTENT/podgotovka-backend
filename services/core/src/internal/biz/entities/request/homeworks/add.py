@@ -9,7 +9,6 @@ from src.internal.biz.entities.request.homeworks.without_answer.add import Homew
 
 
 class HomeworkAddRequest(BaseRequestModel):
-    lesson_id: int = Field(..., example=1)
     homework_type: HomeworkTypeEnum = Field(..., example=HomeworkTypeEnum.test)
     homework_without_answer: Optional[HomeworkWithoutAnswerRequest]
     homework_test: Optional[HomeworkTestRequest]

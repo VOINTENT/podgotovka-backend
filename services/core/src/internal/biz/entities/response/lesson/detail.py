@@ -1,17 +1,22 @@
 from typing import Optional, List
 
-from pydantic import Field
+from pydantic.fields import Field
 
 from src.internal.biz.entities.response.base import BaseResponseModel
-from src.internal.biz.entities.response.homework.info import HomeworkInfoResponse
-from src.internal.biz.entities.response.lesson.lesson_file import LessonFileSimpleResponse
+from src.internal.biz.entities.response.course.simple import CourseSimpleResponse
+from src.internal.biz.entities.response.homework.detail import HomeworkDetailResponse
+from src.internal.biz.entities.response.subject.simple import SubjectSimpleResponse
 
 
 class LessonDetailResponse(BaseResponseModel):
-    id: int = Field(..., example=1)
-    name: str = Field(..., example='Название')
+    subject: Optional[SubjectSimpleResponse] = Field(None)
+    course: Optional[CourseSimpleResponse] = Field(None)
+    name: Optional[str] = Field(None, example='Название')
     description: Optional[str] = Field(None, example='Описание')
-    files: List[LessonFileSimpleResponse]
-    homework: Optional[HomeworkInfoResponse]
+    youtube_link: Optional[str] = Field(None, example='https://...')
+    date: Optional[int] = Field(None, example=123456789)
+    time_start: Optional[int] = Field(None, example=400)
+    time_finish: Optional[int] = Field(None, example=460)
+    file_links: Optional[List[str]] = Field(None, example=['https://...', 'https://...'])
     lecture: Optional[str] = Field(None, example='Лекция')
-    is_subscribed: Optional[bool] = Field(None, example=True)
+    homework: Optional[HomeworkDetailResponse]
