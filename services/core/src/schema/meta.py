@@ -25,7 +25,7 @@ metadata = sqlalchemy.MetaData(naming_convention=naming_convention)
 account_teacher_table = Table(
     'account_teacher',
     metadata,
-    Column('id', Integer, default=Sequence('account_teacher_seq'), primary_key=True),
+    Column('id', Integer, Sequence('account_teacher_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('email', Text, CheckConstraint('char_length(email) >= 4 AND char_length(email) <= 100'), nullable=False,
@@ -42,14 +42,14 @@ account_teacher_table = Table(
 structure_table = Table(
     'structure',
     metadata,
-    Column('id', Integer, default=Sequence('structure_seq'), primary_key=True),
+    Column('id', Integer, Sequence('structure_id_seq', start=1), primary_key=True),
     Column('name', Text, CheckConstraint("name IN ('primary-school', 'school', 'high-school')"), nullable=False, unique=True),
 )
 
 course_table = Table(
     'course',
     metadata,
-    Column('id', Integer, default=Sequence('course_seq'), primary_key=True),
+    Column('id', Integer, Sequence('course_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('name', Text, nullable=False),
@@ -60,7 +60,7 @@ course_table = Table(
 subject_table = Table(
     'subject',
     metadata,
-    Column('id', Integer, default=Sequence('subject_seq'), primary_key=True),
+    Column('id', Integer, Sequence('subject_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('name', Text, CheckConstraint('char_length(name) >= 1 AND char_length(name) <= 500'), nullable=False,
@@ -70,7 +70,7 @@ subject_table = Table(
 subject_course = Table(
     'subject_course',
     metadata,
-    Column('id', Integer, default=Sequence('subject_seq'), primary_key=True),
+    Column('id', Integer, Sequence('subject_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('subject_id', ForeignKey('subject.id')),
@@ -80,7 +80,7 @@ subject_course = Table(
 lesson_table = Table(
     'lesson',
     metadata,
-    Column('id', Integer, default=Sequence('lesson_seq'), primary_key=True),
+    Column('id', Integer, Sequence('lesson_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('name', Text, CheckConstraint('1 <= char_length(name) AND char_length(name) <= 1000')),
@@ -94,6 +94,7 @@ lesson_table = Table(
     Column('subject_id', ForeignKey('subject.id')),
     Column('course_id', ForeignKey('course.id')),
     Column('homework_id', ForeignKey('homework.id')),
+    Column('account_teacher_id', ForeignKey('account_teacher.id')),
     CheckConstraint('time_finish IS NULL OR time_start < time_finish')
 )
 
@@ -101,7 +102,7 @@ lesson_table = Table(
 lesson_file_table = Table(
     'lesson_file',
     metadata,
-    Column('id', Integer, default=Sequence('lesson_file_seq'), primary_key=True),
+    Column('id', Integer, Sequence('lesson_file_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('lesson_id', ForeignKey('lesson.id'), nullable=False),
@@ -113,7 +114,7 @@ lesson_file_table = Table(
 homework_table = Table(
     'homework',
     metadata,
-    Column('id', Integer, default=Sequence('homework_seq'), primary_key=True),
+    Column('id', Integer, Sequence('homework_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('homework_type', Text, CheckConstraint("homework_type IN ('test', 'without-answer')")),
@@ -126,7 +127,7 @@ homework_table = Table(
 homework_without_answer_table = Table(
     'homework_without_answer',
     metadata,
-    Column('id', Integer, default=Sequence('homework_without_answer_seq'), primary_key=True),
+    Column('id', Integer, Sequence('homework_without_answer_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('question', JSONB)
@@ -136,7 +137,7 @@ homework_without_answer_table = Table(
 homework_test_table = Table(
     'homework_test',
     metadata,
-    Column('id', Integer, default=Sequence('homework_test_seq'), primary_key=True),
+    Column('id', Integer, Sequence('homework_test_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now)
 )
@@ -145,7 +146,7 @@ homework_test_table = Table(
 test_question_table = Table(
     'test_question',
     metadata,
-    Column('id', Integer, default=Sequence('test_question_seq'), primary_key=True),
+    Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('homework_test_id', ForeignKey('homework_test.id'), nullable=False),
@@ -159,7 +160,7 @@ test_question_table = Table(
 prompt_table = Table(
     'prompt',
     metadata,
-    Column('id', Integer, default=Sequence('test_question_seq'), primary_key=True),
+    Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('test_question_id', ForeignKey('test_question.id')),
@@ -170,7 +171,7 @@ prompt_table = Table(
 answer_variant_table = Table(
     'answer_variant',
     metadata,
-    Column('id', Integer, default=Sequence('test_question_seq'), primary_key=True),
+    Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('test_question_id', ForeignKey('test_question.id'), nullable=False),

@@ -8,10 +8,10 @@ from src.internal.biz.entities.biz.account.account import Account
 from src.internal.biz.entities.response.account.token import TokenResponse
 from src.internal.biz.services.accounts_teacher import AccountsTeacherService
 
-teacher_accounts_router = APIRouter(prefix='/accounts-teacher', tags=['Teacher Accounts'])
+accounts_teacher_router = APIRouter(prefix='/accounts-teacher', tags=['Accounts Teacher'])
 
 
-@teacher_accounts_router.post('/auth/base', response_model=TokenResponse)
+@accounts_teacher_router.post('/auth/base', response_model=TokenResponse)
 async def auth_base(form_data: OAuth2PasswordRequestForm = Depends()):
     new_account: Account = AccountCreator().get_from_form_data(form_data)
     token: Token = await AccountsTeacherService.auth_account_base(new_account)
