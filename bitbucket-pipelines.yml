@@ -35,6 +35,6 @@ pipelines:
            - title_message=$($git_log --pretty=format:"%s")
            - text_message=$($git_log --pretty=format:"%b")
            - pip3 install -r ./helpers/notifier/requirements.txt
-           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#1f13ff"
+           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#36a64f"
           services:
             - postgres

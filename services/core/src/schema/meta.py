@@ -67,10 +67,10 @@ subject_table = Table(
            unique=True),
 )
 
-subject_course = Table(
+subject_course_table = Table(
     'subject_course',
     metadata,
-    Column('id', Integer, Sequence('subject_id_seq', start=1), primary_key=True),
+    Column('id', Integer, default=Sequence('subject_course_id_seq'), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('subject_id', ForeignKey('subject.id')),

@@ -10,4 +10,3 @@ class HomeworkTestQuestionPrompt:
         self.id = id
         self.test_question_id = test_question_id
         self.text = text
-

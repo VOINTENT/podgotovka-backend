@@ -7,9 +7,11 @@ from src.internal.biz.creators.base import Creator
 
 
 class CreatorBiz(Creator):
+    @staticmethod
     @abstractmethod
-    def get_from_record(self, record: Record):
+    def get_from_record(record: Record):
         pass
 
-    def get_from_record_many(self, records: List[Record]):
-        return [self.get_from_record(record) for record in records]
+    @classmethod
+    def get_from_record_many(cls, records: List[Record]):
+        return [cls.get_from_record(record) for record in records]

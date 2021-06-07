@@ -1,0 +1,6 @@
+from typing import Dict, Any
+
+
+def assert_simple_subject_response(result: Dict[str, Any], id: int, name: str):
+    assert result['id'] == id
+    assert result['name'] == name

@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from contextlib import asynccontextmanager
 from typing import Optional, List, Any
 
@@ -62,27 +62,3 @@ class BaseDao(ABC):
     async def fetchval(self, query) -> Any:
         async with self._connection as conn:
             return await conn.fetchval(query)
-
-    @abstractmethod
-    async def add(self, obj):
-        pass
-
-    @abstractmethod
-    async def add_many(self, obj):
-        pass
-
-    @abstractmethod
-    async def get_by_id(self, id):
-        pass
-
-    @abstractmethod
-    async def get_all(self, limit: Optional[int] = 1_000_000, offset: Optional[int] = 0):
-        pass
-
-    @abstractmethod
-    async def update(self, id, obj):
-        pass
-
-    @abstractmethod
-    async def remove_by_id(self, id):
-        pass

@@ -1,7 +1,12 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends
 
+from src.internal.biz.creators.response.course_simple import CourseSimpleResponseCreator
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
+from src.internal.biz.entities.biz.course import Course
 from src.internal.biz.entities.response.course.simple import CourseSimpleResponse
+from src.internal.biz.services.courses import CoursesService
 from src.internal.servers.http.depends.auth import get_current_account_teacher
 from src.internal.servers.http.depends.filters import get_subject_id
 from src.internal.servers.http.depends.pagination import PaginationParams
@@ -25,3 +30,11 @@ async def get_my_students_courses(
         subject_id: int = Depends(get_subject_id)
 ):
     pass
+
+
+@courses_router.get('/', response_model=List[CourseSimpleResponse])
+async def get_all_courses(pagination_params: PaginationParams = Depends(),
+                          subject_id: Optional[int] = Depends(get_subject_id)):
+    courses: List[Course] = await CoursesService.get_all(limit=pagination_params.limit, skip=pagination_params.skip,
+                                                         subject_id=subject_id)
+    return CourseSimpleResponseCreator.get_many_from_courses(courses)
