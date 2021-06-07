@@ -52,7 +52,7 @@ course_table = Table(
     Column('id', Integer, default=Sequence('course_seq'), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('name', nullable=False),
+    Column('name', Text, nullable=False),
     Column('structure_id', ForeignKey('structure.id'), nullable=False),
     UniqueConstraint('name', 'structure_id')
 )
@@ -94,7 +94,7 @@ lesson_table = Table(
     Column('subject_id', ForeignKey('subject.id')),
     Column('course_id', ForeignKey('course.id')),
     Column('homework_id', ForeignKey('homework.id')),
-    CheckConstraint('time_finish IS NULL OR time_start < time_end')
+    CheckConstraint('time_finish IS NULL OR time_start < time_finish')
 )
 
 
@@ -116,7 +116,7 @@ homework_table = Table(
     Column('id', Integer, default=Sequence('homework_seq'), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('homework_type', CheckConstraint("homework_type IN ('test', 'without-answer')")),
+    Column('homework_type', Text, CheckConstraint("homework_type IN ('test', 'without-answer')")),
     Column('homework_without_answer_id', ForeignKey('homework_without_answer.id')),
     Column('homework_test_id', ForeignKey('homework_test.id')),
     CheckConstraint('homework_without_answer_id IS NULL OR homework_test_id IS NULL')
@@ -151,7 +151,7 @@ test_question_table = Table(
     Column('homework_test_id', ForeignKey('homework_test.id'), nullable=False),
     Column('name', Text),
     Column('description', JSONB),
-    Column('answer_type', CheckConstraint("answer_type IN ('one', 'many', 'text')")),
+    Column('answer_type', Text, CheckConstraint("answer_type IN ('one', 'many', 'text')")),
     Column('count_attempts', SmallInteger)
 )
 
@@ -175,5 +175,5 @@ answer_variant_table = Table(
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('test_question_id', ForeignKey('test_question.id'), nullable=False),
     Column('text', Text),
-    Column('is_right', nullable=False)
+    Column('is_right', Boolean, nullable=False)
 )
