@@ -33,7 +33,7 @@ pipelines:
 
       - step:
           name: Deploying code to development server
-          deployment: Development
+          deployment: Staging
           script:
            - ssh $USER@$HOST "rm -rf services && rm -rf configs"
            - pipe: atlassian/rsync-deploy:0.4.3
