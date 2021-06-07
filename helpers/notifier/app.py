@@ -9,7 +9,7 @@ def send_message(slack_api_token: str,
                  author_name: str,
                  title_message: str,
                  text_message: str,
-                 icon_emoji: str = ':bee:',
+                 icon_emoji: str = ':bulat-in-zoom:',
                  color: str = '#36a64f'):
     try:
         WebClient(token=slack_api_token).chat_postMessage(

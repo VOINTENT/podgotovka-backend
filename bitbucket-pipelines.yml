@@ -1,0 +1,52 @@
+image: python:3.8
+
+clone:
+  depth: 100
+
+definitions:
+  services:
+    postgres:
+      image: postgres
+      variables:
+        POSTGRES_DB: $PODGOTOVKA_PRIMARY_DB_NAME
+        POSTGRES_USER: $PODGOTOVKA_DB_USER
+        POSTGRES_PASSWORD: $PODGOTOVKA_DB_PASSWORD
+
+pipelines:
+  branches:
+    develop:
+      - step:
+          name: Testing and linting
+          deployment: Test
+          script:
+           - python3 -V
+           - pip3 install -r ./services/core/requirements.txt
+           - flake8 --ignore=E501,W293,W503 ./services/core/src
+
+           - echo 'Creating db schema...'
+           - cd services/core && alembic upgrade head && cd ../..
+
+           - echo 'Running tests...'
+           - pytest services/core/tests -vs
+          services:
+            - postgres
+
+      - step:
+          name: Deploying code to development server
+          deployment: Development
+          script:
+           - ssh $USER@$HOST "rm -rf services && rm -rf configs"
+           - pipe: atlassian/rsync-deploy:0.4.3
+             variables:
+               USER: $USER
+               SERVER: $HOST
+               REMOTE_PATH: '~'
+               LOCAL_PATH: './services ./assets/dev/configs'
+
+            - echo 'Sending message to slack...'
+            - git_log='git log -n 1'
+            - author_name=$($git_log --pretty=format:"%an")
+            - title_message=$($git_log --pretty=format:"%s")
+            - text_message=$($git_log --pretty=format:"%b")
+            - pip3 install -r ./helpers/notifier/requirements.txt
+            - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-onelinks" "$author_name" "$title_message" "$text_message" "#1f13ff"
