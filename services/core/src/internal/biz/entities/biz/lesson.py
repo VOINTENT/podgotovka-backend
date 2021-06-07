@@ -3,6 +3,7 @@ from typing import Optional
 
 from src.internal.biz.entities.biz.course import Course
 from src.internal.biz.entities.biz.document import Document
+from src.internal.biz.entities.biz.homework.homework import Homework
 from src.internal.biz.entities.biz.subject import Subject
 
 
