@@ -43,10 +43,10 @@ pipelines:
                REMOTE_PATH: '~'
                LOCAL_PATH: './services ./assets/dev/configs'
 
-            - echo 'Sending message to slack...'
-            - git_log='git log -n 1'
-            - author_name=$($git_log --pretty=format:"%an")
-            - title_message=$($git_log --pretty=format:"%s")
-            - text_message=$($git_log --pretty=format:"%b")
-            - pip3 install -r ./helpers/notifier/requirements.txt
-            - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-onelinks" "$author_name" "$title_message" "$text_message" "#1f13ff"
+           - echo 'Sending message to slack...'
+           - git_log='git log -n 1'
+           - author_name=$($git_log --pretty=format:"%an")
+           - title_message=$($git_log --pretty=format:"%s")
+           - text_message=$($git_log --pretty=format:"%b")
+           - pip3 install -r ./helpers/notifier/requirements.txt
+           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-onelinks" "$author_name" "$title_message" "$text_message" "#1f13ff"
