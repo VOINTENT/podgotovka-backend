@@ -158,6 +158,7 @@ test_question_table = Table(
 
 prompt_table = Table(
     'prompt',
+    metadata,
     Column('id', Integer, default=Sequence('test_question_seq'), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
