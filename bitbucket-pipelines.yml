@@ -28,20 +28,6 @@ pipelines:
 
            - echo 'Running tests...'
            - pytest services/core/tests -vs
-          services:
-            - postgres
-
-      - step:
-          name: Deploying code to development server
-          deployment: Staging
-          script:
-           - ssh $USER@$HOST "rm -rf services && rm -rf configs"
-           - pipe: atlassian/rsync-deploy:0.4.3
-             variables:
-               USER: $USER
-               SERVER: $HOST
-               REMOTE_PATH: '~'
-               LOCAL_PATH: './services ./assets/dev/configs'
 
            - echo 'Sending message to slack...'
            - git_log='git log -n 1'
@@ -49,4 +35,6 @@ pipelines:
            - title_message=$($git_log --pretty=format:"%s")
            - text_message=$($git_log --pretty=format:"%b")
            - pip3 install -r ./helpers/notifier/requirements.txt
-           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-onelinks" "$author_name" "$title_message" "$text_message" "#1f13ff"
+           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#1f13ff"
+          services:
+            - postgres
