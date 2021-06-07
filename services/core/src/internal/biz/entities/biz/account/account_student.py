@@ -4,7 +4,7 @@ from src.internal.biz.entities.biz.account.account import Account
 from src.internal.biz.entities.biz.photo import Photo
 
 
-class AccountTeacher(Account):
+class AccountStudent(Account):
     def __init__(self,
                  id: Optional[int] = None,
                  name: Optional[str] = None,

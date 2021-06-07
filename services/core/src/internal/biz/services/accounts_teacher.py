@@ -1,11 +1,14 @@
+from typing import Optional
+
 from src.internal.biz.creators.biz.token import TokenCreator
 from src.internal.biz.dao.teacher import TeacherAccountDao
 from src.internal.biz.entities.biz.account.account import Account
+from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.biz.account.token import Token
 from src.internal.servers.http.exceptions.account import AccountsExceptionEnum
 
 
-class AccountTeacherService:
+class AccountsTeacherService:
     @staticmethod
     async def auth_account_base(account: Account) -> Token:
         existed_account = await TeacherAccountDao().get_by_email(account.email)
@@ -15,3 +18,7 @@ class AccountTeacherService:
         token = TokenCreator().get_from_account(existed_account)
         token.create_auth_token()
         return token
+
+    @staticmethod
+    async def get_by_id_simple(account_teacher_id: int) -> Optional[AccountTeacher]:
+        pass
