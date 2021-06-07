@@ -26,7 +26,10 @@ async def get_lessons(date_start: datetime = Depends(get_date_start),
                       order: OrderEnum = Depends(get_order),
                       course_id: int = Depends(get_course_id),
                       subject_id: int = Depends(get_subject_id)):
-    pass
+    lessons_with_counts = await LessonService.get_all_lessons_with_counts(
+        limit=pagination_params.limit, skip=pagination_params.skip, date_start=date_start, order=order,
+        course_id=course_id, subject_id=subject_id)
+    return LessonSimpleResponseCreator.get_from_lesson_with_counts_many(lessons_with_counts)
 
 
 @lessons_router.get('/my/teachers', response_model=LessonSimpleListWithCountsResponse)

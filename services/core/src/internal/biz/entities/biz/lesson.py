@@ -10,6 +10,7 @@ from src.internal.biz.entities.biz.subject import Subject
 class Lesson:
     def __init__(self,
                  id: Optional[int] = None,
+                 created_at: Optional[datetime.datetime] = None,
                  subject: Optional[Subject] = None,
                  course: Optional[Course] = None,
                  name: Optional[str] = None,
@@ -20,6 +21,7 @@ class Lesson:
                  documents: Optional[Document] = None,
                  lecture: Optional[str] = None,
                  homework: Optional[Homework] = None) -> None:
+        self.created_at = created_at
         self.id = id
         self.subject = subject
         self.course = course
