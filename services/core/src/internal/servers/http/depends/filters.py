@@ -7,7 +7,7 @@ from src.internal.biz.entities.enum.order import OrderEnum
 
 
 def get_date_start(date_start: Optional[int] = Query(None, ge=1, le=90_000_000_000)) -> datetime:
-    return datetime.fromtimestamp(date_start)
+    return datetime.fromtimestamp(date_start) if date_start else None
 
 
 def get_order(order: Optional[OrderEnum] = Query(OrderEnum.asc)):
