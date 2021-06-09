@@ -18,7 +18,10 @@ def run_query(query: str, *args) -> List[Record]:
 
 async def _run(query: str, *args):
     conn = await asyncpg.connect(get_dsn())
-    return await conn.fetch(query, *args)
+    try:
+        return await conn.fetch(query, *args)
+    finally:
+        await conn.close()
 
 
 def truncate_tables():
