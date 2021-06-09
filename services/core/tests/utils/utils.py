@@ -1,3 +1,4 @@
+import json
 import random
 import uuid
 from datetime import datetime, timedelta
@@ -37,3 +38,9 @@ def get_random_phone() -> str:
 
 def get_random_datetime() -> datetime:
     return random.choice([datetime(year=year, month=1, day=1) for year in range(1970, 2021)])
+
+
+def get_random_json(length: Optional[int] = None) -> str:
+    if not length:
+        length = random.randint(3, 10)
+    return json.dumps({get_random_str(3): get_random_str(4) for _ in range(length)})

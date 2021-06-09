@@ -19,6 +19,10 @@ class BaseDao(ABC):
         await self.__pool.release(conn)
 
     @property
+    def conn(self) -> Connection:
+        return self.__conn
+
+    @property
     @asynccontextmanager
     async def _connection(self):
         if self.__conn:

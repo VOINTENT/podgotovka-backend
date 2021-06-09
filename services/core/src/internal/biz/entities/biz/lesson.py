@@ -22,7 +22,9 @@ class Lesson:
                  lecture: Optional[str] = None,
                  homework: Optional[Homework] = None,
                  is_published: Optional[bool] = None,
-                 account_teacher_id: Optional[int] = None) -> None:
+                 account_teacher_id: Optional[int] = None,
+                 is_watched: Optional[bool] = None) -> None:
+        self.is_watched = is_watched
         self.account_teacher_id = account_teacher_id
         self.is_published = is_published
         self.created_at = created_at
@@ -37,3 +39,10 @@ class Lesson:
         self.documents = documents
         self.lecture = lecture
         self.homework = homework
+
+    @property
+    def finish_time_in_seconds(self) -> int:
+        if not self.time_finish:
+            raise TypeError
+
+        return self.time_finish.hour * 3600 + self.time_finish.minute * 60

@@ -1,12 +1,15 @@
 from datetime import datetime
-from typing import Optional
+from pprint import pprint
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends
 
 from src.internal.biz.creators.response.lesson import LessonResponseCreator
+from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.enum.order import OrderEnum
+from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.biz.entities.response.lesson.detail import LessonDetailResponse
 from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
@@ -21,15 +24,15 @@ lessons_router = APIRouter(prefix='/lessons', tags=['Lessons'])
 
 
 @lessons_router.get('/', response_model=LessonSimpleListWithCountsResponse)
-async def get_lessons(date_start: datetime = Depends(get_date_start),
-                      pagination_params: PaginationParams = Depends(),
-                      order: OrderEnum = Depends(get_order),
-                      course_id: int = Depends(get_course_id),
-                      subject_id: int = Depends(get_subject_id)):
-    lessons_with_counts = await LessonService.get_all_lessons_with_counts(
+async def get_published_lessons(date_start: datetime = Depends(get_date_start),
+                                pagination_params: PaginationParams = Depends(),
+                                order: OrderEnum = Depends(get_order),
+                                course_id: int = Depends(get_course_id),
+                                subject_id: int = Depends(get_subject_id)):
+    lessons_with_counts: LessonsWithCounts = await LessonService.get_published_lessons_with_counts(
         limit=pagination_params.limit, skip=pagination_params.skip, date_start=date_start, order=order,
         course_id=course_id, subject_id=subject_id)
-    return LessonSimpleResponseCreator.get_from_lesson_with_counts_many(lessons_with_counts)
+    return LessonSimpleListWithCountsResponseCreator.get_from_lessons_with_counts(lessons_with_counts)
 
 
 @lessons_router.get('/my/teachers', response_model=LessonSimpleListWithCountsResponse)

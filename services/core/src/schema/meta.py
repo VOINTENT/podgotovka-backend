@@ -39,6 +39,14 @@ account_teacher_table = Table(
            CheckConstraint('char_length(hash_password) >= 1 AND char_length(hash_password) <= 500'), nullable=False)
 )
 
+account_student_table = Table(
+    'account_student',
+    metadata,
+    Column('id', Integer, Sequence('account_teacher_id_seq', start=1), primary_key=True),
+    Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
+    Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now)
+)
+
 structure_table = Table(
     'structure',
     metadata,
@@ -74,7 +82,8 @@ subject_course_table = Table(
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('subject_id', ForeignKey('subject.id')),
-    Column('course_id', ForeignKey('course.id'))
+    Column('course_id', ForeignKey('course.id')),
+    UniqueConstraint('subject_id', 'course_id')
 )
 
 lesson_table = Table(
@@ -86,16 +95,14 @@ lesson_table = Table(
     Column('name', Text, CheckConstraint('1 <= char_length(name) AND char_length(name) <= 1000')),
     Column('description', Text, CheckConstraint('1 <= char_length(description) AND char_length(description) <= 5000')),
     Column('youtube_link', Text, CheckConstraint('char_length(youtube_link) >= 1 AND char_length(youtube_link) <= 500')),
-    Column('date_start', Date),
-    Column('time_start', Time),
+    Column('time_start', DateTime),
     Column('time_finish', Time),
     Column('text', JSONB),
     Column('is_published', Boolean, server_default=expression.false(), nullable=False),
     Column('subject_id', ForeignKey('subject.id')),
     Column('course_id', ForeignKey('course.id')),
     Column('homework_id', ForeignKey('homework.id')),
-    Column('account_teacher_id', ForeignKey('account_teacher.id')),
-    CheckConstraint('time_finish IS NULL OR time_start < time_finish')
+    Column('account_teacher_id', ForeignKey('account_teacher.id'))
 )
 
 
@@ -177,4 +184,15 @@ answer_variant_table = Table(
     Column('test_question_id', ForeignKey('test_question.id'), nullable=False),
     Column('text', Text),
     Column('is_right', Boolean, nullable=False)
+)
+
+
+lesson_view_table = Table(
+    'lesson_view',
+    metadata,
+    Column('id', Integer, Sequence('lesson_view_id_seq', start=1), primary_key=True),
+    Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
+    Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
+    Column('lesson_id', ForeignKey('lesson.id'), nullable=False),
+    Column('account_student_id', ForeignKey('account_student.id'), nullable=False)
 )

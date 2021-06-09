@@ -1,7 +1,7 @@
 from starlette.testclient import TestClient
 
 from tests.test_data import TestSubjectData, TestSubjectData2, TestCourseData
-from tests.utils.asserts.subject import assert_simple_subject_response
+from tests.utils.asserts.subject import assert_subject_simple_response
 
 
 def test_get_all_subjects(client: TestClient, truncate, subjects):
@@ -11,8 +11,8 @@ def test_get_all_subjects(client: TestClient, truncate, subjects):
     result = response.json()
     assert len(result) == 2
 
-    assert_simple_subject_response(result[0], id=TestSubjectData.id, name=TestSubjectData.name)
-    assert_simple_subject_response(result[1], id=TestSubjectData2.id, name=TestSubjectData2.name)
+    assert_subject_simple_response(result[0], id=TestSubjectData.id, name=TestSubjectData.name)
+    assert_subject_simple_response(result[1], id=TestSubjectData2.id, name=TestSubjectData2.name)
 
 
 def test_get_all_subjects_filter_course(client: TestClient, truncate, structures, subjects, courses, subject_course):
@@ -22,4 +22,4 @@ def test_get_all_subjects_filter_course(client: TestClient, truncate, structures
     result = response.json()
     assert len(result) == 1
 
-    assert_simple_subject_response(result[0], id=TestSubjectData.id, name=TestSubjectData.name)
+    assert_subject_simple_response(result[0], id=TestSubjectData.id, name=TestSubjectData.name)

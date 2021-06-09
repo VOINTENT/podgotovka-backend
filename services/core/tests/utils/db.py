@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 from typing import List
 
 import asyncpg
@@ -21,7 +22,9 @@ async def _run(query: str, *args):
 
 
 def truncate_tables():
-    run_query("""TRUNCATE TABLE account_teacher, lesson_file, lesson, subject, subject_course, structure, course""")
+    run_query("""
+        TRUNCATE TABLE account_teacher, lesson_file, lesson, subject, subject_course, structure, course, lesson_view
+    """)
 
 
 def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
@@ -52,3 +55,17 @@ def create_structure(id: int, name: str) -> None:
     run_query("""
         INSERT INTO structure(id, name) VALUES ($1, $2);
     """, id, name)
+
+
+def create_lesson(
+        id: int, name: str, description: str, youtube_link: str, time_start: datetime.datetime,
+        time_finish: datetime.time, text: str, is_published: bool, subject_id, course_id: int, homework_id: int,
+        account_teacher_id: int
+):
+    run_query(
+        """
+        INSERT INTO lesson(id, name, description, youtube_link, time_start, time_finish, text, is_published, subject_id,
+        course_id, homework_id, account_teacher_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        """, id, name, description, youtube_link, time_start, time_finish, text, is_published, subject_id, course_id,
+        homework_id, account_teacher_id
+    )

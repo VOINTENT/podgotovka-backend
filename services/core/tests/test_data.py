@@ -1,4 +1,6 @@
-from tests.utils.utils import get_random_int, get_random_datetime, get_random_email, get_random_str
+import datetime
+
+from tests.utils.utils import get_random_int, get_random_datetime, get_random_email, get_random_str, get_random_json
 
 
 class TestAccountTeacherData:
@@ -50,3 +52,35 @@ class TestCourseData2:
 class TestSubjectCourseData:
     subject_id = TestSubjectData.id
     course_id = TestCourseData.id
+
+
+class TestLessonData:
+    id = get_random_int()
+    name = get_random_str()
+    description = get_random_str()
+    youtube_link = get_random_str()
+    time_start = datetime.datetime(year=2021, month=1, day=1, hour=10, minute=0)
+    time_finish = datetime.datetime(year=2021, month=1, day=1, hour=11, minute=0)
+    text = get_random_json()
+    is_published = True
+    subject = TestSubjectData
+    course = TestCourseData
+    homework_id = None
+    account_teacher_id = TestAccountTeacherData.id
+    is_watched = False
+
+
+class TestLessonData2:
+    id = get_random_int()
+    name = get_random_str()
+    description = get_random_str()
+    youtube_link = get_random_str()
+    time_start = datetime.datetime(year=2021, month=2, day=1, hour=10, minute=0)
+    time_finish = datetime.datetime(year=2021, month=2, day=1, hour=11, minute=0)
+    text = get_random_json()
+    is_published = True
+    subject = TestSubjectData2
+    course = TestCourseData2
+    homework_id = None
+    account_teacher_id = TestAccountTeacherData.id
+    is_watched = False
