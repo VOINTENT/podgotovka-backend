@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from typing import List
+from typing import List, Optional
 
 import asyncpg
 from asyncpg import Record
@@ -23,7 +23,10 @@ async def _run(query: str, *args):
 
 def truncate_tables():
     run_query("""
-        TRUNCATE TABLE account_teacher, lesson_file, lesson, subject, subject_course, structure, course, lesson_view
+        TRUNCATE TABLE account_teacher, account_student, structure, course, subject, subject_course, lesson, 
+        lesson_file, homework, homework_without_answer, homework_test, test_question, prompt, 
+        answer_variant, lesson_view, subject_course_subscription,
+        subject_course_subscription
     """)
 
 
@@ -69,3 +72,28 @@ def create_lesson(
         """, id, name, description, youtube_link, time_start, time_finish, text, is_published, subject_id, course_id,
         homework_id, account_teacher_id
     )
+
+
+def create_homework(id: int, homework_type: str, homework_without_answer_id: Optional[int],
+                    homework_test_id: Optional[int]):
+    run_query("""
+        INSERT INTO homework(id, homework_type, homework_without_answer_id, homework_test_id) VALUES ($1, $2, $3, $4)
+    """, id, homework_type, homework_without_answer_id, homework_test_id)
+
+
+def create_homework_test(id: int):
+    run_query("""INSERT INTO homework_test(id) VALUES ($1)""", id)
+
+
+def create_test_question(id: int, homework_test_id: int, name: str, description: str, answer_type: str,
+                         count_attempts: int):
+    run_query("""
+        INSERT INTO test_question(id, homework_test_id, name, description, answer_type, count_attempts)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    """, id, homework_test_id, name, description, answer_type, count_attempts)
+
+
+def create_lesson_file(id: int, name: str, file_link: str, lesson_id: int):
+    run_query("""
+        INSERT INTO lesson_file(id, name, file_link, lesson_id) VALUES ($1, $2, $3, $4)
+    """, id, name, file_link, lesson_id)

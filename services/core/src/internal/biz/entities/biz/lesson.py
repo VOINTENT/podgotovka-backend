@@ -1,9 +1,10 @@
 import datetime
-from typing import Optional
+from typing import Optional, List
 
 from src.internal.biz.entities.biz.course import Course
 from src.internal.biz.entities.biz.document import Document
 from src.internal.biz.entities.biz.homework.homework import Homework
+from src.internal.biz.entities.biz.homework.info import HomeworkInfo
 from src.internal.biz.entities.biz.subject import Subject
 
 
@@ -18,12 +19,16 @@ class Lesson:
                  youtube_link: Optional[str] = None,
                  time_start: Optional[datetime.datetime] = None,
                  time_finish: Optional[datetime.time] = None,
-                 documents: Optional[Document] = None,
+                 documents: Optional[List[Document]] = None,
                  lecture: Optional[str] = None,
                  homework: Optional[Homework] = None,
                  is_published: Optional[bool] = None,
                  account_teacher_id: Optional[int] = None,
-                 is_watched: Optional[bool] = None) -> None:
+                 is_watched: Optional[bool] = None,
+                 is_subscribed: Optional[bool] = None,
+                 homework_info: Optional[HomeworkInfo] = None) -> None:
+        self.homework_info = homework_info
+        self.is_subscribed = is_subscribed
         self.is_watched = is_watched
         self.account_teacher_id = account_teacher_id
         self.is_published = is_published

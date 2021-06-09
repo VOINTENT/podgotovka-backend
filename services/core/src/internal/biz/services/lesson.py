@@ -6,6 +6,7 @@ from src.internal.biz.dao.lesson import LessonDao
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
+from src.internal.servers.http.exceptions.lessons import LessonsExceptionEnum
 
 
 class LessonService:
@@ -33,6 +34,9 @@ class LessonService:
 
     @staticmethod
     async def get_lesson_detail_for_student(lesson_id: int, auth_account_student_id: int) -> Lesson:
-        lesson = await LessonDao().get_detail_with_homework_info(lesson_id=lesson_id,
-                                                                 account_student_id=auth_account_student_id)
+        lesson = await LessonDao().get_detail_with_files_with_homework_info(lesson_id=lesson_id,
+                                                                            account_student_id=auth_account_student_id)
+
+        if not lesson:
+            raise LessonsExceptionEnum.LESSON_NOT_FOUND
         return lesson

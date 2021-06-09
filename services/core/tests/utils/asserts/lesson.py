@@ -1,9 +1,12 @@
 import datetime
 from typing import Dict, Any, List, Type
 
-from tests.test_data import TestLessonData, TestCourseData, TestSubjectData
+from tests.test_data import TestLessonData, TestCourseData, TestSubjectData, TestHomeworkData, TestLessonFileData
 from tests.utils.asserts.course import assert_course_simple_response
+from tests.utils.asserts.homework import assert_homework_info_response
+from tests.utils.asserts.lesson_file import assert_file_simple_response
 from tests.utils.asserts.subject import assert_subject_simple_response
+from tests.utils.asserts.utils import assert_json
 
 
 def assert_lesson_simple_list_with_counts_response(response: Dict[str, Any], count_last: int, count_next: int,
@@ -26,3 +29,22 @@ def assert_lesson_simple_response(response: Dict[str, Any], id: int, name: str, 
     assert response['start_time'] == round(start_time.timestamp())
     assert response['finish_time'] == finish_time.hour * 3600 + finish_time.minute * 60
     assert response['is_watched'] is is_watched
+
+
+def assert_lesson_detail_for_student_response(
+        response: Dict[str, Any], id: int, name: str, description: str, files: List[List[Any]],
+        lecture: str, is_subscribed: bool, homework_id: int, homework_is_available: bool, homework_type: str,
+        homework_count_questions: int, homework_count_right_answers: int):
+
+    assert response['id'] == id
+    assert response['name'] == name
+    assert response['description'] == description
+    for file_simple_response, file in zip(response['files'], files):
+        assert_file_simple_response(file_simple_response, name=file[0], file_link=file[1])
+
+    assert_homework_info_response(
+        response['homework'], id=homework_id, is_available=homework_is_available, type=homework_type,
+        count_questions=homework_count_questions, count_right_answers=homework_count_right_answers)
+
+    assert_json(response['lecture'], lecture)
+    assert response['is_subscribed'] is is_subscribed

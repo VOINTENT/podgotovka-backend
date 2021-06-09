@@ -81,8 +81,8 @@ subject_course_table = Table(
     Column('id', Integer, default=Sequence('subject_course_id_seq'), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('subject_id', ForeignKey('subject.id')),
-    Column('course_id', ForeignKey('course.id')),
+    Column('subject_id', ForeignKey('subject.id', ondelete='CASCADE')),
+    Column('course_id', ForeignKey('course.id', ondelete='CASCADE')),
     UniqueConstraint('subject_id', 'course_id')
 )
 
@@ -99,10 +99,10 @@ lesson_table = Table(
     Column('time_finish', Time),
     Column('text', JSONB),
     Column('is_published', Boolean, server_default=expression.false(), nullable=False),
-    Column('subject_id', ForeignKey('subject.id')),
-    Column('course_id', ForeignKey('course.id')),
-    Column('homework_id', ForeignKey('homework.id')),
-    Column('account_teacher_id', ForeignKey('account_teacher.id'))
+    Column('subject_id', ForeignKey('subject.id', ondelete='CASCADE')),
+    Column('course_id', ForeignKey('course.id', ondelete='CASCADE')),
+    Column('homework_id', ForeignKey('homework.id', ondelete='SET NULL')),
+    Column('account_teacher_id', ForeignKey('account_teacher.id', ondelete='SET NULL'))
 )
 
 
@@ -112,7 +112,8 @@ lesson_file_table = Table(
     Column('id', Integer, Sequence('lesson_file_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('lesson_id', ForeignKey('lesson.id'), nullable=False),
+    Column('lesson_id', ForeignKey('lesson.id', ondelete='CASCADE'), nullable=False),
+    Column('name', Text, CheckConstraint('char_length(name) >= 1 AND char_length(name) <= 500')),
     Column('file_link', Text, CheckConstraint('char_length(file_link) >= 3 AND char_length(file_link) <= 500'),
            nullable=False),
 )
@@ -125,8 +126,8 @@ homework_table = Table(
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('homework_type', Text, CheckConstraint("homework_type IN ('test', 'without-answer')")),
-    Column('homework_without_answer_id', ForeignKey('homework_without_answer.id')),
-    Column('homework_test_id', ForeignKey('homework_test.id')),
+    Column('homework_without_answer_id', ForeignKey('homework_without_answer.id', ondelete='CASCADE')),
+    Column('homework_test_id', ForeignKey('homework_test.id', ondelete='CASCADE')),
     CheckConstraint('homework_without_answer_id IS NULL OR homework_test_id IS NULL')
 )
 
@@ -156,7 +157,7 @@ test_question_table = Table(
     Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('homework_test_id', ForeignKey('homework_test.id'), nullable=False),
+    Column('homework_test_id', ForeignKey('homework_test.id', ondelete='CASCADE'), nullable=False),
     Column('name', Text),
     Column('description', JSONB),
     Column('answer_type', Text, CheckConstraint("answer_type IN ('one', 'many', 'text')")),
@@ -170,7 +171,7 @@ prompt_table = Table(
     Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('test_question_id', ForeignKey('test_question.id')),
+    Column('test_question_id', ForeignKey('test_question.id', ondelete='CASCADE')),
     Column('text', JSONB)
 )
 
@@ -181,7 +182,7 @@ answer_variant_table = Table(
     Column('id', Integer, Sequence('test_question_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('test_question_id', ForeignKey('test_question.id'), nullable=False),
+    Column('test_question_id', ForeignKey('test_question.id', ondelete='CASCADE'), nullable=False),
     Column('text', Text),
     Column('is_right', Boolean, nullable=False)
 )
@@ -193,8 +194,8 @@ lesson_view_table = Table(
     Column('id', Integer, Sequence('lesson_view_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('lesson_id', ForeignKey('lesson.id'), nullable=False),
-    Column('account_student_id', ForeignKey('account_student.id'), nullable=False)
+    Column('lesson_id', ForeignKey('lesson.id', ondelete='CASCADE'), nullable=False),
+    Column('account_student_id', ForeignKey('account_student.id', ondelete='CASCADE'), nullable=False)
 )
 
 
@@ -204,8 +205,8 @@ subject_course_subscription_table = Table(
     Column('id', Integer, Sequence('lesson_view_id_seq', start=1), primary_key=True),
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
-    Column('student_account_id', ForeignKey('student_account.id'), nullable=False),
-    Column('subject_id', ForeignKey('subject.id'), nullable=False),
-    Column('course_id', ForeignKey('course.id'), nullable=False),
-    UniqueConstraint('student_account_id', 'subject_id', 'course_id')
+    Column('account_student_id', ForeignKey('account_student.id', ondelete='CASCADE'), nullable=False),
+    Column('subject_id', ForeignKey('subject.id', ondelete='CASCADE'), nullable=False),
+    Column('course_id', ForeignKey('course.id', ondelete='CASCADE'), nullable=False),
+    UniqueConstraint('account_student_id', 'subject_id', 'course_id')
 )

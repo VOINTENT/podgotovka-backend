@@ -1,9 +1,14 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 
 class File(ABC):
 
-    def __init__(self, full_url: str, short_url: str, prefix_url: str, optional_url: str) -> None:
+    def __init__(self,
+                 full_url: Optional[str] = None,
+                 short_url: Optional[str] = None,
+                 prefix_url: Optional[str] = None,
+                 optional_url: Optional[str] = None) -> None:
         self.optional_url = optional_url
         self.prefix_url = prefix_url
         self.short_url = short_url

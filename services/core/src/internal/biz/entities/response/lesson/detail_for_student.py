@@ -14,4 +14,4 @@ class LessonDetailForStudentResponse(BaseResponseModel):
     files: List[LessonFileSimpleResponse]
     homework: Optional[HomeworkInfoResponse]
     lecture: Optional[str] = Field(None, example='Лекция')
-    is_subscribed: Optional[bool] = Field(None, example=True)
+    is_subscribed: bool = Field(..., example=True)
