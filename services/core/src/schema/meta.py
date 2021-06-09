@@ -2,7 +2,7 @@ from datetime import datetime
 
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, Sequence, DateTime, func, Text, CheckConstraint, ForeignKey, \
-    UniqueConstraint, Date, Time, Boolean, SmallInteger
+    UniqueConstraint, Time, Boolean, SmallInteger
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import expression
 

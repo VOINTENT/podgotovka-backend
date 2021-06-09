@@ -1,6 +1,5 @@
 from datetime import datetime
-from pprint import pprint
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 
