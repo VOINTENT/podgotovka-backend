@@ -12,7 +12,6 @@ class LessonSimpleResponse(BaseResponseModel):
     name: str = Field(..., example='Название')
     course: CourseSimpleResponse
     subject: SubjectSimpleResponse
-    date: int = Field(..., example=123456789)
-    start_time: int = Field(..., example=420)
+    start_time: int = Field(..., example=123456789)
     finish_time: Optional[int] = Field(None, example=560)
     is_watched: bool = Field(..., example=True)

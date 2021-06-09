@@ -20,7 +20,11 @@ class Lesson:
                  time_finish: Optional[datetime.time] = None,
                  documents: Optional[Document] = None,
                  lecture: Optional[str] = None,
-                 homework: Optional[Homework] = None) -> None:
+                 homework: Optional[Homework] = None,
+                 is_published: Optional[bool] = None,
+                 account_teacher_id: Optional[int] = None) -> None:
+        self.account_teacher_id = account_teacher_id
+        self.is_published = is_published
         self.created_at = created_at
         self.id = id
         self.subject = subject
