@@ -196,3 +196,16 @@ lesson_view_table = Table(
     Column('lesson_id', ForeignKey('lesson.id'), nullable=False),
     Column('account_student_id', ForeignKey('account_student.id'), nullable=False)
 )
+
+
+subject_course_subscription_table = Table(
+    'subject_course_subscription',
+    metadata,
+    Column('id', Integer, Sequence('lesson_view_id_seq', start=1), primary_key=True),
+    Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
+    Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
+    Column('student_account_id', ForeignKey('student_account.id'), nullable=False),
+    Column('subject_id', ForeignKey('subject.id'), nullable=False),
+    Column('course_id', ForeignKey('course.id'), nullable=False),
+    UniqueConstraint('student_account_id', 'subject_id', 'course_id')
+)

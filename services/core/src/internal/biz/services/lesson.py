@@ -16,10 +16,10 @@ class LessonService:
     @staticmethod
     async def get_published_lessons_with_counts(
             limit: int, skip: int, date_start: datetime.datetime, order: OrderEnum, course_id: int, subject_id: int,
-            account_student_id: Optional[int] = None) -> LessonsWithCounts:
+            auth_account_student_id: Optional[int] = None) -> LessonsWithCounts:
         lessons: List[Lesson] = await LessonDao().get_published_lessons(
             limit=limit, offset=skip, date_start=date_start, order=order, course_id=course_id, subject_id=subject_id,
-            account_student_id=account_student_id
+            account_student_id=auth_account_student_id
         )
 
         if lessons:
@@ -30,3 +30,9 @@ class LessonService:
             count_next = 0
 
         return LessonWithCountsCreator.get_from_args(lessons=lessons, count_last=count_last, count_next=count_next)
+
+    @staticmethod
+    async def get_lesson_detail_for_student(lesson_id: int, auth_account_student_id: int) -> Lesson:
+        lesson = await LessonDao().get_detail_with_homework_info(lesson_id=lesson_id,
+                                                                 account_student_id=auth_account_student_id)
+        return lesson
