@@ -4,6 +4,7 @@ from asyncpg import Record
 
 from src.internal.biz.creators.biz.base import CreatorBiz
 from src.internal.biz.creators.biz.course import CourseCreator
+from src.internal.biz.creators.biz.homework_info import HomeworkInfoCreator
 from src.internal.biz.creators.biz.subject import SubjectCreator
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
@@ -24,7 +25,10 @@ class LessonCreator(CreatorBiz):
             course=CourseCreator.get_from_record(record),
             subject=SubjectCreator.get_from_record(record),
             account_teacher_id=record.get('account_teacher_id'),
-            is_watched=record.get('lesson_is_watched')
+            is_watched=record.get('lesson_is_watched'),
+            lecture=record.get('lesson_lecture'),
+            homework_info=HomeworkInfoCreator.get_from_record(record),
+            is_subscribed=record.get('lesson_is_subscribed')
         )
 
     @classmethod

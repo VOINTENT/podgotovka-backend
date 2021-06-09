@@ -59,7 +59,7 @@ class FastAPIServer:
         @app.on_event('startup')
         async def init_primary_db():
             await AsyncPg.init_primary_db(DB_HOST, DB_USER, DB_PASSWORD, DB_PORT, PRIMARY_DB_NAME,
-                                          min_size=10, max_size=10)
+                                          min_size=1, max_size=1)
 
         @app.on_event('shutdown')
         async def close_primary_db():

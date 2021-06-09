@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 
 from src.internal.biz.creators.response.lesson import LessonResponseCreator
+from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
@@ -57,11 +58,13 @@ async def get_my_student_lessons(
     pass
 
 
-@lessons_router.get('/{lesson_id}', response_model=LessonDetailForStudentResponse)
+@lessons_router.get('/{lesson_id}/students', response_model=LessonDetailForStudentResponse)
 async def get_lesson_detail(
         lesson_id: int,
         current_account_student: Optional[AccountStudent] = Depends(get_optional_current_account_student)):
-    pass
+    lesson = await LessonService.get_lesson_detail_for_student(
+        lesson_id, current_account_student.id if current_account_student else None)
+    return LessonDetailForStudentResponseCreator.get_from_lesson(lesson)
 
 
 @lessons_router.post('/{lesson_id}/watched', response_model=bool)

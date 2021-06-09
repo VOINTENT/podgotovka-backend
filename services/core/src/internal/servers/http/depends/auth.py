@@ -11,7 +11,7 @@ from src.internal.biz.services.accounts_student import AccountsStudentService
 from src.internal.biz.services.accounts_teacher import AccountsTeacherService
 from src.internal.servers.http.exceptions.account import AccountsExceptionEnum
 
-oauth2_scheme_student = OAuth2PasswordBearer(tokenUrl="accounts-student/auth/base")
+oauth2_scheme_student = OAuth2PasswordBearer(tokenUrl="accounts-student/auth/base", auto_error=False)
 oauth2_scheme_teacher = OAuth2PasswordBearer(tokenUrl='accounts-teacher/auth/base')
 
 
@@ -19,14 +19,14 @@ async def _get_account_teacher_id_from_token(token: str = Depends(oauth2_scheme_
     return _get_account_id_from_token(token)
 
 
-async def _get_account_student_id_from_token(token: str = Depends(oauth2_scheme_student)) -> Optional[int]:
+async def _get_account_student_id_from_token(token: Optional[str] = Depends(oauth2_scheme_student)) -> Optional[int]:
     return _get_account_id_from_token(token)
 
 
 def _get_account_id_from_token(token: str) -> Optional[int]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ENCRYPT_ALGORITHM])
-    except JWTError:
+    except (JWTError, AttributeError):
         return None
 
     try:

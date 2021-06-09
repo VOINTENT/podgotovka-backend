@@ -5,9 +5,11 @@ from starlette.testclient import TestClient
 
 from src.internal.drivers.fast_api import FastAPIServer
 from tests.test_data import TestAccountTeacherData, TestSubjectData, TestSubjectData2, TestCourseData, TestCourseData2, \
-    TestSubjectCourseData, TestStructureData, TestStructureData2, TestStructureData3, TestLessonData, TestLessonData2
+    TestSubjectCourseData, TestStructureData, TestStructureData2, TestStructureData3, TestLessonData, TestLessonData2, \
+    TestHomeworkData, TestHomeworkTestData, TestQuestionData, TestQuestionData2, TestLessonFileData, TestLessonFileData2
 from tests.utils.db import truncate_tables, create_account_teacher, create_subject, create_course, \
-    create_subject_course, create_structure, create_lesson
+    create_subject_course, create_structure, create_lesson, create_homework, create_homework_test, create_test_question, \
+    create_lesson_file
 
 
 @pytest.fixture(scope='session')
@@ -32,6 +34,15 @@ def teacher_account():
         name=TestAccountTeacherData.name,
         hash_password=TestAccountTeacherData.hash_password
     )
+
+
+@pytest.fixture()
+def teacher_account_access_token(teacher_account, client: TestClient):
+    response = client.post('/core/v1/accounts-teacher/auth/base', data={
+        'username': TestAccountTeacherData.email,
+        'password': TestAccountTeacherData.password
+    })
+    return response.json()['access_token']
 
 
 @pytest.fixture()
@@ -67,6 +78,12 @@ def lesson():
                   course_id=TestLessonData.course.id, homework_id=TestLessonData.homework_id,
                   account_teacher_id=TestLessonData.account_teacher_id)
 
+    create_lesson_file(id=TestLessonFileData.id, name=TestLessonFileData.name, file_link=TestLessonFileData.file_link,
+                       lesson_id=TestLessonFileData.lesson_id)
+
+    create_lesson_file(id=TestLessonFileData2.id, name=TestLessonFileData2.name, file_link=TestLessonFileData2.file_link,
+                       lesson_id=TestLessonFileData2.lesson_id)
+
 
 @pytest.fixture()
 def lesson2():
@@ -76,3 +93,20 @@ def lesson2():
                   is_published=TestLessonData2.is_published, subject_id=TestLessonData2.subject.id,
                   course_id=TestLessonData2.course.id, homework_id=TestLessonData2.homework_id,
                   account_teacher_id=TestLessonData2.account_teacher_id)
+
+
+@pytest.fixture()
+def homework():
+    create_homework_test(id=TestHomeworkTestData.id)
+
+    create_test_question(id=TestQuestionData.id, homework_test_id=TestQuestionData.homework_test_id,
+                         name=TestQuestionData.name, description=TestQuestionData.description,
+                         answer_type=TestQuestionData.answer_type, count_attempts=TestQuestionData.count_attempts)
+
+    create_test_question(id=TestQuestionData2.id, homework_test_id=TestQuestionData2.homework_test_id,
+                         name=TestQuestionData2.name, description=TestQuestionData2.description,
+                         answer_type=TestQuestionData2.answer_type, count_attempts=TestQuestionData2.count_attempts)
+
+    create_homework(id=TestHomeworkData.id, homework_type=TestHomeworkData.homework_type,
+                    homework_without_answer_id=TestHomeworkData.homework_without_answer_id,
+                    homework_test_id=TestHomeworkData.homework_test_id)

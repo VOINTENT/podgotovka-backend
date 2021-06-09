@@ -1,8 +1,8 @@
 """Initial revision
 
-Revision ID: da66a9ae4cab
+Revision ID: 98f8d0b78eed
 Revises: 
-Create Date: 2021-06-09 13:19:49.282170
+Create Date: 2021-06-09 17:41:19.922743
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'da66a9ae4cab'
+revision = '98f8d0b78eed'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -85,9 +85,10 @@ def upgrade():
                     sa.CheckConstraint('homework_without_answer_id IS NULL OR homework_test_id IS NULL',
                                        name=op.f('ck__homework__')),
                     sa.ForeignKeyConstraint(['homework_test_id'], ['homework_test.id'],
-                                            name=op.f('fk__homework__homework_test_id__homework_test')),
+                                            name=op.f('fk__homework__homework_test_id__homework_test'),
+                                            ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['homework_without_answer_id'], ['homework_without_answer.id'], name=op.f(
-                        'fk__homework__homework_without_answer_id__homework_without_answer')),
+                        'fk__homework__homework_without_answer_id__homework_without_answer'), ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__homework'))
                     )
     op.create_table('test_question',
@@ -100,7 +101,8 @@ def upgrade():
                     sa.Column('answer_type', sa.Text(), nullable=True),
                     sa.Column('count_attempts', sa.SmallInteger(), nullable=True),
                     sa.ForeignKeyConstraint(['homework_test_id'], ['homework_test.id'],
-                                            name=op.f('fk__test_question__homework_test_id__homework_test')),
+                                            name=op.f('fk__test_question__homework_test_id__homework_test'),
+                                            ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__test_question'))
                     )
     op.create_table('answer_variant',
@@ -111,7 +113,8 @@ def upgrade():
                     sa.Column('text', sa.Text(), nullable=True),
                     sa.Column('is_right', sa.Boolean(), nullable=False),
                     sa.ForeignKeyConstraint(['test_question_id'], ['test_question.id'],
-                                            name=op.f('fk__answer_variant__test_question_id__test_question')),
+                                            name=op.f('fk__answer_variant__test_question_id__test_question'),
+                                            ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__answer_variant'))
                     )
     op.create_table('lesson',
@@ -130,12 +133,14 @@ def upgrade():
                     sa.Column('homework_id', sa.Integer(), nullable=True),
                     sa.Column('account_teacher_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['account_teacher_id'], ['account_teacher.id'],
-                                            name=op.f('fk__lesson__account_teacher_id__account_teacher')),
-                    sa.ForeignKeyConstraint(['course_id'], ['course.id'], name=op.f('fk__lesson__course_id__course')),
+                                            name=op.f('fk__lesson__account_teacher_id__account_teacher'),
+                                            ondelete='SET NULL'),
+                    sa.ForeignKeyConstraint(['course_id'], ['course.id'], name=op.f('fk__lesson__course_id__course'),
+                                            ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['homework_id'], ['homework.id'],
-                                            name=op.f('fk__lesson__homework_id__homework')),
+                                            name=op.f('fk__lesson__homework_id__homework'), ondelete='SET NULL'),
                     sa.ForeignKeyConstraint(['subject_id'], ['subject.id'],
-                                            name=op.f('fk__lesson__subject_id__subject')),
+                                            name=op.f('fk__lesson__subject_id__subject'), ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__lesson'))
                     )
     op.create_table('prompt',
@@ -145,7 +150,8 @@ def upgrade():
                     sa.Column('test_question_id', sa.Integer(), nullable=True),
                     sa.Column('text', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
                     sa.ForeignKeyConstraint(['test_question_id'], ['test_question.id'],
-                                            name=op.f('fk__prompt__test_question_id__test_question')),
+                                            name=op.f('fk__prompt__test_question_id__test_question'),
+                                            ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__prompt'))
                     )
     op.create_table('subject_course',
@@ -155,21 +161,41 @@ def upgrade():
                     sa.Column('subject_id', sa.Integer(), nullable=True),
                     sa.Column('course_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['course_id'], ['course.id'],
-                                            name=op.f('fk__subject_course__course_id__course')),
+                                            name=op.f('fk__subject_course__course_id__course'), ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['subject_id'], ['subject.id'],
-                                            name=op.f('fk__subject_course__subject_id__subject')),
+                                            name=op.f('fk__subject_course__subject_id__subject'), ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__subject_course')),
                     sa.UniqueConstraint('subject_id', 'course_id',
                                         name=op.f('uq__subject_course__subject_id_course_id'))
+                    )
+    op.create_table('subject_course_subscription',
+                    sa.Column('id', sa.Integer(), nullable=False),
+                    sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+                    sa.Column('edited_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
+                    sa.Column('account_student_id', sa.Integer(), nullable=False),
+                    sa.Column('subject_id', sa.Integer(), nullable=False),
+                    sa.Column('course_id', sa.Integer(), nullable=False),
+                    sa.ForeignKeyConstraint(['account_student_id'], ['account_student.id'], name=op.f(
+                        'fk__subject_course_subscription__account_student_id__account_student'), ondelete='CASCADE'),
+                    sa.ForeignKeyConstraint(['course_id'], ['course.id'],
+                                            name=op.f('fk__subject_course_subscription__course_id__course'),
+                                            ondelete='CASCADE'),
+                    sa.ForeignKeyConstraint(['subject_id'], ['subject.id'],
+                                            name=op.f('fk__subject_course_subscription__subject_id__subject'),
+                                            ondelete='CASCADE'),
+                    sa.PrimaryKeyConstraint('id', name=op.f('pk__subject_course_subscription')),
+                    sa.UniqueConstraint('account_student_id', 'subject_id', 'course_id', name=op.f(
+                        'uq__subject_course_subscription__account_student_id_subject_id_course_id'))
                     )
     op.create_table('lesson_file',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('created_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
                     sa.Column('edited_at', sa.DateTime(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
                     sa.Column('lesson_id', sa.Integer(), nullable=False),
+                    sa.Column('name', sa.Text(), nullable=True),
                     sa.Column('file_link', sa.Text(), nullable=False),
                     sa.ForeignKeyConstraint(['lesson_id'], ['lesson.id'],
-                                            name=op.f('fk__lesson_file__lesson_id__lesson')),
+                                            name=op.f('fk__lesson_file__lesson_id__lesson'), ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__lesson_file'))
                     )
     op.create_table('lesson_view',
@@ -179,9 +205,10 @@ def upgrade():
                     sa.Column('lesson_id', sa.Integer(), nullable=False),
                     sa.Column('account_student_id', sa.Integer(), nullable=False),
                     sa.ForeignKeyConstraint(['account_student_id'], ['account_student.id'],
-                                            name=op.f('fk__lesson_view__account_student_id__account_student')),
+                                            name=op.f('fk__lesson_view__account_student_id__account_student'),
+                                            ondelete='CASCADE'),
                     sa.ForeignKeyConstraint(['lesson_id'], ['lesson.id'],
-                                            name=op.f('fk__lesson_view__lesson_id__lesson')),
+                                            name=op.f('fk__lesson_view__lesson_id__lesson'), ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id', name=op.f('pk__lesson_view'))
                     )
 
@@ -189,6 +216,7 @@ def upgrade():
 def downgrade():
     op.drop_table('lesson_view')
     op.drop_table('lesson_file')
+    op.drop_table('subject_course_subscription')
     op.drop_table('subject_course')
     op.drop_table('prompt')
     op.drop_table('lesson')
