@@ -4,6 +4,7 @@ from typing import List, Optional
 from src.internal.biz.creators.biz.lesson_with_counts import LessonWithCountsCreator
 from src.internal.biz.dao.lesson import LessonDao
 from src.internal.biz.entities.biz.lesson import Lesson
+from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.servers.http.exceptions.lessons import LessonsExceptionEnum
@@ -13,6 +14,26 @@ class LessonService:
     @staticmethod
     async def create_empty_lesson(account_teacher_id: int) -> Lesson:
         return await LessonDao().add(account_teacher_id)
+
+    @staticmethod
+    def _transfer_none_fields(past_state: Lesson, future_state: Lesson) -> Lesson:
+        for attr, value in vars(future_state).items():
+            if value is None:
+                past_value = getattr(past_state, attr)
+                setattr(future_state, attr, past_value)
+        return future_state
+
+    @staticmethod
+    async def update_lesson(lesson: Lesson) -> Lesson:
+        lesson_old_state = await LessonDao().get(lesson.id, lesson.account_teacher_id)
+        if not lesson_old_state:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        lesson = LessonService._transfer_none_fields(lesson_old_state, lesson)
+
+        async with LessonDao().connection_transaction() as conn:
+            # TODO нужно возвращать актульное состояние из БД (сейчас возвращается то, что было отправлено)
+            return await LessonDao(conn).update(lesson)
 
     @staticmethod
     async def get_published_lessons_with_counts(

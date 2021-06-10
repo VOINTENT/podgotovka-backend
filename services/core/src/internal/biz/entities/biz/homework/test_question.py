@@ -11,7 +11,7 @@ class TestQuestion:
                  answer_type: Optional[AnswerTypeEnum] = None,
                  answer_variants: Optional[List[AnswerVariant]] = None,
                  count_attempts: Optional[int] = None,
-                 prompts: Optional[Prompt] = None) -> None:
+                 prompts: Optional[List[Prompt]] = None) -> None:
         self.text = text
         self.answer_type = answer_type
         self.answer_variants = answer_variants

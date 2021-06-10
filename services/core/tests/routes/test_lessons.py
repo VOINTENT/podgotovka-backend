@@ -1,16 +1,26 @@
-import time
-
 from starlette.testclient import TestClient
 
-from tests.test_data import TestLessonData, TestLessonData2, TestLessonFileData, TestHomeworkData, TestLessonFileData2
+from tests.test_data import TestLessonData, TestLessonData2, TestLessonFileData, TestHomeworkData, TestLessonFileData2, \
+    TestAccountTeacherData
 from tests.utils.asserts.lesson import assert_lesson_simple_list_with_counts_response, \
     assert_lesson_detail_for_student_response
+from tests.utils.db import run_query
+from tests.utils.utils import get_auth_headers
+
+
+def test_add_empty_lesson(client: TestClient, truncate, teacher_account, teacher_account_access_token):
+    response = client.post('/core/v1/lessons/', json={},
+                           headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+    lessons = run_query("SELECT id, account_teacher_id FROM lesson WHERE account_teacher_id=$1",
+                        TestAccountTeacherData.id)
+    assert lessons[0][1] == TestAccountTeacherData.id
 
 
 def test_get_lessons(client: TestClient, truncate, teacher_account, structures, courses, subjects, homework, lesson,
                      lesson2):
-    response = client.get('/core/v1/lessons')
-    assert response.status_code == 200
+    response = client.get('/core/v1/lessons/')
+    assert response.status_code == 200, response.text
 
     result = response.json()
     assert len(result['lessons']) == 2

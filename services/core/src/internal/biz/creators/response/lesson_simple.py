@@ -19,7 +19,7 @@ class LessonSimpleResponseCreator(Creator):
             name=lesson.name,
             course=CourseSimpleResponseCreator.get_from_course(lesson.course),
             subject=SubjectSimpleResponseCreator.get_from_subject(lesson.subject),
-            start_time=round(lesson.time_start.timestamp()),
+            start_time=int(lesson.datetime_start.timestamp()),
             finish_time=lesson.finish_time_in_seconds,
             is_watched=lesson.is_watched
         )

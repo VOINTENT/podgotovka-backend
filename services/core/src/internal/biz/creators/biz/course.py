@@ -11,3 +11,7 @@ class CourseCreator(CreatorBiz):
             id=record.get('course_id'),
             name=record.get('course_name')
         )
+
+    @staticmethod
+    def get_from_request(course_id: int) -> Course:
+        return Course(id=course_id)

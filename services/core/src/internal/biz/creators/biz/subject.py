@@ -11,3 +11,7 @@ class SubjectCreator(CreatorBiz):
             id=record.get('subject_id'),
             name=record.get('subject_name')
         )
+
+    @staticmethod
+    def get_from_request(subject_id: int) -> Subject:
+        return Subject(id=subject_id)

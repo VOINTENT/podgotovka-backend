@@ -81,7 +81,8 @@ def lesson():
     create_lesson_file(id=TestLessonFileData.id, name=TestLessonFileData.name, file_link=TestLessonFileData.file_link,
                        lesson_id=TestLessonFileData.lesson_id)
 
-    create_lesson_file(id=TestLessonFileData2.id, name=TestLessonFileData2.name, file_link=TestLessonFileData2.file_link,
+    create_lesson_file(id=TestLessonFileData2.id, name=TestLessonFileData2.name,
+                       file_link=TestLessonFileData2.file_link,
                        lesson_id=TestLessonFileData2.lesson_id)
 
 

@@ -1,7 +1,8 @@
 from typing import Optional
 
-from pydantic import Field
-
 
 class Prompt:
-    text: Optional[str] = Field(..., example='Текст в формате JSON')
+    def __init__(self, id: Optional[int] = None,
+                 text: Optional[str] = None) -> None:
+        self.id = id
+        self.text = text

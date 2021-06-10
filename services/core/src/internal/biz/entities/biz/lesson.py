@@ -17,7 +17,7 @@ class Lesson:
                  name: Optional[str] = None,
                  description: Optional[str] = None,
                  youtube_link: Optional[str] = None,
-                 time_start: Optional[datetime.datetime] = None,
+                 datetime_start: Optional[datetime.datetime] = None,
                  time_finish: Optional[datetime.time] = None,
                  documents: Optional[List[Document]] = None,
                  lecture: Optional[str] = None,
@@ -34,16 +34,18 @@ class Lesson:
         self.is_published = is_published
         self.created_at = created_at
         self.id = id
+        self.lecture = lecture
+        self.datetime_start = datetime_start
         self.subject = subject
         self.course = course
         self.name = name
         self.description = description
         self.youtube_link = youtube_link
-        self.time_start = time_start
         self.time_finish = time_finish
         self.documents = documents
-        self.lecture = lecture
+        self.is_published = is_published
         self.homework = homework
+        self.account_teacher_id = account_teacher_id
 
     @property
     def finish_time_in_seconds(self) -> int:
