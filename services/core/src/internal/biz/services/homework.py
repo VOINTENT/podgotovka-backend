@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.internal.biz.dao.homework import HomeworkDao
+from src.internal.biz.dao.homework.homework import HomeworkDao
 from src.internal.biz.entities.biz.homework.homework import Homework
 from src.internal.servers.http.exceptions.homework import HomeworkExceptionEnum
 

@@ -1,9 +1,8 @@
 from typing import Optional
 
-from pydantic import Field
-
 
 class Prompt:
-
-    def __init__(self, text: str) -> None:
+    def __init__(self, id: Optional[int] = None,
+                 text: Optional[str] = None) -> None:
+        self.id = id
         self.text = text

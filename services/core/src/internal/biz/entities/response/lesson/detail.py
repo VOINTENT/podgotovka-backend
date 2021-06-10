@@ -9,6 +9,7 @@ from src.internal.biz.entities.response.subject.simple import SubjectSimpleRespo
 
 
 class LessonDetailResponse(BaseResponseModel):
+    id: Optional[int] = Field(None, example=1)
     subject: Optional[SubjectSimpleResponse] = Field(None)
     course: Optional[CourseSimpleResponse] = Field(None)
     name: Optional[str] = Field(None, example='Название')
@@ -19,4 +20,5 @@ class LessonDetailResponse(BaseResponseModel):
     time_finish: Optional[int] = Field(None, example=460)
     file_links: Optional[List[str]] = Field(None, example=['https://...', 'https://...'])
     lecture: Optional[str] = Field(None, example='Лекция')
+    is_published: Optional[bool] = Field(None, example=True)
     homework: Optional[HomeworkDetailResponse]
