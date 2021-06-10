@@ -1,7 +1,7 @@
-from src.internal.biz.entities.response.base import BaseResponseModel
+from enum import Enum
 
 
-class AnswerTypeEnum(BaseResponseModel):
+class AnswerTypeEnum(str, Enum):
     one = 'one'
     many = 'many'
     text = 'text'

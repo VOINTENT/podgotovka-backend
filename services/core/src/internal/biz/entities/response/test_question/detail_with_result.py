@@ -10,6 +10,8 @@ from src.internal.biz.entities.response.test_question.result.previous import Tes
 
 
 class TestQuestionDetailWithResultResponse(BaseResponseModel):
+    id: int = Field(..., example=1)
+    question_name: str = Field(..., example='Название вопроса')
     question_text: str = Field(..., example='String in JSON format')
     answer_type: AnswerTypeEnum = Field(..., example='one')
     answer_variants: Optional[List[AnswerVariantSimpleResponse]] = Field(None, min_items=1)

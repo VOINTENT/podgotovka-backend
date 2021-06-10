@@ -72,7 +72,7 @@ class TestQuestionData2:
     homework_test_id = TestHomeworkTestData.id
     name = get_random_str()
     description = get_random_json()
-    answer_type = 'several'
+    answer_type = 'many'
     count_attempts = get_random_int(10)
 
 
@@ -127,3 +127,31 @@ class TestLessonFileData2:
     name = get_random_str()
     file_link = get_random_str()
     lesson_id = TestLessonData.id
+
+
+class TestAnswerVariantData:
+    id = get_random_int()
+    test_question_id = TestQuestionData.id
+    name = get_random_str()
+    is_right = True
+
+
+class TestAnswerVariantData2:
+    id = get_random_int()
+    test_question_id = TestQuestionData.id
+    name = get_random_str()
+    is_right = False
+
+
+class TestAnswerVariantData3:
+    id = get_random_int()
+    test_question_id = TestQuestionData2.id
+    name = get_random_str()
+    is_right = True
+
+
+class TestAnswerVariantData4:
+    id = get_random_int()
+    test_question_id = TestQuestionData2.id
+    name = get_random_str()
+    is_right = False

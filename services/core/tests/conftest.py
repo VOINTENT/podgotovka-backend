@@ -6,10 +6,11 @@ from starlette.testclient import TestClient
 from src.internal.drivers.fast_api import FastAPIServer
 from tests.test_data import TestAccountTeacherData, TestSubjectData, TestSubjectData2, TestCourseData, TestCourseData2, \
     TestSubjectCourseData, TestStructureData, TestStructureData2, TestStructureData3, TestLessonData, TestLessonData2, \
-    TestHomeworkData, TestHomeworkTestData, TestQuestionData, TestQuestionData2, TestLessonFileData, TestLessonFileData2
+    TestHomeworkData, TestHomeworkTestData, TestQuestionData, TestQuestionData2, TestLessonFileData, \
+    TestLessonFileData2, TestAnswerVariantData, TestAnswerVariantData2, TestAnswerVariantData3, TestAnswerVariantData4
 from tests.utils.db import truncate_tables, create_account_teacher, create_subject, create_course, \
     create_subject_course, create_structure, create_lesson, create_homework, create_homework_test, create_test_question, \
-    create_lesson_file
+    create_lesson_file, create_answer_variant
 
 
 @pytest.fixture(scope='session')
@@ -81,7 +82,8 @@ def lesson():
     create_lesson_file(id=TestLessonFileData.id, name=TestLessonFileData.name, file_link=TestLessonFileData.file_link,
                        lesson_id=TestLessonFileData.lesson_id)
 
-    create_lesson_file(id=TestLessonFileData2.id, name=TestLessonFileData2.name, file_link=TestLessonFileData2.file_link,
+    create_lesson_file(id=TestLessonFileData2.id, name=TestLessonFileData2.name,
+                       file_link=TestLessonFileData2.file_link,
                        lesson_id=TestLessonFileData2.lesson_id)
 
 
@@ -106,6 +108,15 @@ def homework():
     create_test_question(id=TestQuestionData2.id, homework_test_id=TestQuestionData2.homework_test_id,
                          name=TestQuestionData2.name, description=TestQuestionData2.description,
                          answer_type=TestQuestionData2.answer_type, count_attempts=TestQuestionData2.count_attempts)
+
+    create_answer_variant(id=TestAnswerVariantData.id, name=TestAnswerVariantData.name, is_right=TestAnswerVariantData.is_right,
+                          test_question_id=TestAnswerVariantData.test_question_id)
+    create_answer_variant(id=TestAnswerVariantData2.id, name=TestAnswerVariantData2.name, is_right=TestAnswerVariantData2.is_right,
+                          test_question_id=TestAnswerVariantData2.test_question_id)
+    create_answer_variant(id=TestAnswerVariantData3.id, name=TestAnswerVariantData3.name, is_right=TestAnswerVariantData3.is_right,
+                          test_question_id=TestAnswerVariantData3.test_question_id)
+    create_answer_variant(id=TestAnswerVariantData4.id, name=TestAnswerVariantData4.name, is_right=TestAnswerVariantData4.is_right,
+                          test_question_id=TestAnswerVariantData4.test_question_id)
 
     create_homework(id=TestHomeworkData.id, homework_type=TestHomeworkData.homework_type,
                     homework_without_answer_id=TestHomeworkData.homework_without_answer_id,

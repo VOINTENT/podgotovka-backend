@@ -4,4 +4,6 @@ from pydantic import Field
 
 
 class Prompt:
-    text: Optional[str] = Field(..., example='Текст в формате JSON')
+
+    def __init__(self, text: str) -> None:
+        self.text = text
