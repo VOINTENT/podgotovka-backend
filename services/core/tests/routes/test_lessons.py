@@ -87,3 +87,10 @@ def test_get_lesson_detail_without_homework(client: TestClient, truncate, teache
     response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/students')
     assert response.status_code == 200
     assert response.json()['homework'] is None
+
+
+def test_update_lesson(client: TestClient, truncate, teacher_account_access_token, structures, courses, subjects, lesson2):
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={},
+                            headers=get_auth_headers(teacher_account_access_token))
+    print(response.json())
+    assert response.status_code == 200

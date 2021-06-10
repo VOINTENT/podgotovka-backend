@@ -88,13 +88,13 @@ async def unsubscribe_to_subject_and_course(lesson_id: int,
 
 @lessons_router.post('/', response_model=LessonDetailResponse)
 async def lesson_create(account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
-    lesson = await LessonService.create_empty_lesson(account_teacher_request.id)
+    lesson = await LessonService.create_empty_lesson(account_teacher_id=account_teacher_request.id)
     return LessonDetailResponseCreator.get_from_one(lesson)
 
 
 @lessons_router.patch('/{lesson_id}', response_model=LessonDetailResponse)
 async def lesson_update(lesson_id: int,
                         lesson_request: LessonUpdateRequest,
-                        account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
-    lesson: Lesson = LessonCreator().get_from_request(lesson_request, lesson_id, account_teacher_request.id)
-    return LessonDetailResponseCreator.get_from_one(await LessonService.update_lesson(lesson))
+                        account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
+    lesson = await LessonService.update_lesson(lesson_id, lesson_request, account_teacher.id)
+    return LessonDetailResponseCreator.get_from_one(lesson)

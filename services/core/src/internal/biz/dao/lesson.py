@@ -32,20 +32,26 @@ class LessonDao(BaseDao):
             return None
         return row['lesson_id']
 
-    async def get(self, lesson_id: int, account_teacher_id) -> Optional[Lesson]:
-        query = select(self.__class__._get_simple_select()). \
-            select_from(self.__class__._get_joined_for_select()). \
-            where(and_(lesson_table.c.id == lesson_id,
-                       lesson_table.c.account_teacher_id == account_teacher_id))
+    async def get(self, lesson_id: int) -> Optional[Lesson]:
+        query = select(
+            self.__class__._get_simple_select()
+        ).select_from(
+            self.__class__._get_joined_for_select()
+        ).where(and_(
+            lesson_table.c.id == lesson_id
+        ))
+
         row = await self.fetchone(query)
         if not row:
             return None
         return LessonCreator().get_from_record(row)
 
-    async def add(self, account_teacher_id: int) -> Lesson:
-        query = lesson_table.insert(). \
-            values(account_teacher_id=account_teacher_id). \
-            returning(lesson_table.c.id.label('lesson_id'))
+    async def add(self, lesson: Lesson) -> Lesson:
+        query = lesson_table.insert().values(
+            account_teacher_id=lesson.account_teacher_id
+        ).returning(
+            lesson_table.c.id.label('lesson_id')
+        )
         row = await self.fetchone(query)
         return LessonCreator().get_from_record(row)
 
@@ -60,60 +66,21 @@ class LessonDao(BaseDao):
             await homework_dao.delete_deep(homework_id)
 
     async def update(self, lesson: Lesson) -> Lesson:
-        async with self._connection as conn:
-            if lesson.homework:
-                await self.delete_homework_deep(lesson.id)
-                lesson.homework = await HomeworkDao(conn).add(lesson.homework)
-            if lesson.documents:
-                lesson_file_dao = LessonFileDao(conn)
-                await lesson_file_dao.delete(lesson.id)
-                lesson.documents = await lesson_file_dao.add(lesson.documents, lesson.id)
-
-        subject_id = lesson.subject.id if lesson.subject else None
-        course_id = lesson.course.id if lesson.course else None
-
-        query = lesson_table.update(). \
-            values(name=lesson.name,
-                   description=lesson.description,
-                   youtube_link=lesson.youtube_link,
-                   time_start=lesson.datetime_start,
-                   time_finish=lesson.time_finish,
-                   text=lesson.lecture,
-                   homework_id=lesson.homework.id if lesson.homework else None,
-                   subject_id=subject_id,
-                   course_id=course_id,
-                   account_teacher_id=lesson.account_teacher_id,
-                   is_published=lesson.is_published). \
-            where(lesson_table.c.id == lesson.id)
+        query = lesson_table.update().values(
+            name=lesson.name,
+            description=lesson.description,
+            youtube_link=lesson.youtube_link,
+            time_start=lesson.datetime_start,
+            time_finish=lesson.time_finish,
+            text=lesson.lecture,
+            subject_id=lesson.subject.id if lesson.subject else None,
+            course_id=lesson.course.id if lesson.course else None
+        ).where(
+            lesson_table.c.id == lesson.id)
 
         await self.execute(query)
 
         return lesson
-
-    @staticmethod
-    def _get_simple_select():
-        return [lesson_table.c.id.label('lesson_id'),
-                lesson_table.c.name.label('lesson_name'),
-                lesson_table.c.description.label('lesson_description'),
-                lesson_table.c.youtube_link.label('lesson_youtube_link'),
-                lesson_table.c.time_start.label('lesson_datetime_start'),
-                lesson_table.c.time_finish.label('lesson_time_finish'),
-                lesson_table.c.text.label('lesson_lecture'),
-                lesson_table.c.is_published.label('lesson_is_published'),
-                lesson_table.c.subject_id.label('subject_id'),
-                lesson_table.c.course_id.label('course_id'),
-                lesson_table.c.homework_id.label('lesson_id'),
-                lesson_table.c.account_teacher_id.label('account_teacher_id'),
-
-                subject_table.c.name.label('subject_name'),
-                course_table.c.name.label('course_name'),
-                ]
-
-    @staticmethod
-    def _get_joined_for_select():
-        return lesson_table. \
-            outerjoin(subject_table, subject_table.c.id == lesson_table.c.subject_id). \
-            outerjoin(course_table, course_table.c.id == lesson_table.c.course_id)
 
     async def get_published_lessons(self, limit: int, offset: int, date_start: datetime.datetime, order: OrderEnum,
                                     course_id: int, subject_id: int, account_student_id: Optional[int] = None):
@@ -213,6 +180,19 @@ class LessonDao(BaseDao):
             return None
         return LessonCreator.get_from_record(row)
 
+    async def get_documents_by_lesson_id(self, lesson_id) -> List[Document]:
+        query = select([
+            lesson_file_table.c.name.label('lesson_document_name'),
+            lesson_file_table.c.file_link.label('lesson_document_file_link')
+        ]).select_from(
+            lesson_file_table
+        ).where(
+            lesson_file_table.c.lesson_id == lesson_id
+        )
+
+        rows = await self.fetchall(query)
+        return DocumentCreator.get_many_from_record(rows)
+
     @staticmethod
     def _get_select_count_questions(homework_id: int) -> Select:
         return select([
@@ -227,15 +207,26 @@ class LessonDao(BaseDao):
     def _get_columns_id_name() -> List[Column]:
         return [lesson_table.c.id.label('lesson_id'), lesson_table.c.name.label('lesson_name')]
 
-    async def get_documents_by_lesson_id(self, lesson_id) -> List[Document]:
-        query = select([
-            lesson_file_table.c.name.label('lesson_document_name'),
-            lesson_file_table.c.file_link.label('lesson_document_file_link')
-        ]).select_from(
-            lesson_file_table
-        ).where(
-            lesson_file_table.c.lesson_id == lesson_id
-        )
+    @staticmethod
+    def _get_simple_select():
+        return [
+            lesson_table.c.id.label('lesson_id'),
+            lesson_table.c.name.label('lesson_name'),
+            lesson_table.c.description.label('lesson_description'),
+            lesson_table.c.youtube_link.label('lesson_youtube_link'),
+            lesson_table.c.time_start.label('lesson_datetime_start'),
+            lesson_table.c.time_finish.label('lesson_time_finish'),
+            lesson_table.c.text.label('lesson_lecture'),
+            lesson_table.c.is_published.label('lesson_is_published'),
+            lesson_table.c.subject_id.label('subject_id'),
+            lesson_table.c.course_id.label('course_id'),
+            lesson_table.c.homework_id.label('lesson_id'),
+            lesson_table.c.account_teacher_id.label('account_teacher_id'),
 
-        rows = await self.fetchall(query)
-        return DocumentCreator.get_many_from_record(rows)
+            subject_table.c.name.label('subject_name'),
+            course_table.c.name.label('course_name'),
+        ]
+
+    @staticmethod
+    def _get_joined_for_select():
+        return lesson_table.outerjoin(subject_table).outerjoin(course_table)
