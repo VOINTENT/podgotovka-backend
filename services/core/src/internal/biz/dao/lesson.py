@@ -1,9 +1,10 @@
 import datetime
+import json
 from typing import Optional, List
 
 from src.internal.biz.dao.homework.homework import HomeworkDao
 from src.internal.biz.dao.lesson_file import LessonFileDao
-from sqlalchemy import select, and_, func, Column, case, text
+from sqlalchemy import select, and_, func, Column, case, text, null
 from sqlalchemy.sql import Select
 from src.internal.biz.creators.biz.document import DocumentCreator
 from src.internal.biz.entities.biz.document import Document
@@ -65,18 +66,18 @@ class LessonDao(BaseDao):
 
             await homework_dao.delete_deep(homework_id)
 
-    async def update(self, lesson: Lesson) -> Lesson:
+    async def update(self, lesson_id: int, lesson: Lesson) -> Lesson:
         query = lesson_table.update().values(
             name=lesson.name,
             description=lesson.description,
             youtube_link=lesson.youtube_link,
             time_start=lesson.datetime_start,
             time_finish=lesson.time_finish,
-            text=lesson.lecture,
+            text=json.loads(lesson.lecture) if lesson.lecture else null(),
             subject_id=lesson.subject.id if lesson.subject else None,
             course_id=lesson.course.id if lesson.course else None
         ).where(
-            lesson_table.c.id == lesson.id)
+            lesson_table.c.id == lesson_id)
 
         await self.execute(query)
 

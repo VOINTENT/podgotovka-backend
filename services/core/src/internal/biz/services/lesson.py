@@ -36,8 +36,7 @@ class LessonService:
             raise LessonExceptionEnum.LESSON_FORBIDDEN
 
         new_lesson = LessonCreator.get_from_existed_and_updated(existed_lesson, lesson_request)
-        print(new_lesson.__dict__)
-        return await LessonDao().update(new_lesson)
+        return await LessonDao().update(lesson_id, new_lesson)
 
     @staticmethod
     async def get_published_lessons_with_counts(

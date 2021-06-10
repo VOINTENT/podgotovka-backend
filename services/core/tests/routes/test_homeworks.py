@@ -2,7 +2,7 @@ from starlette.testclient import TestClient
 
 from tests.test_data import TestHomeworkData, TestQuestionData, TestAnswerVariantData, TestAnswerVariantData2, \
     TestQuestionData2, TestAnswerVariantData3, TestAnswerVariantData4
-from tests.utils.asserts.homework import assert_homework_detail_with_results_response
+from tests.utils.asserts.models.homework import assert_homework_detail_with_results_response
 
 
 def test_get_homework_detail_for_student(client: TestClient, truncate, homework):
