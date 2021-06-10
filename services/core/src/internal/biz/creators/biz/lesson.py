@@ -1,11 +1,10 @@
 import datetime
-from typing import Optional, Union
+from typing import Optional
 
 from asyncpg import Record
 
 from src.internal.biz.creators.biz.base import CreatorBiz
 from src.internal.biz.creators.biz.file import DocumentCreator
-from src.internal.biz.creators.biz.homework.homework import HomeworkCreator
 from src.internal.biz.creators.biz.course import CourseCreator
 from src.internal.biz.creators.biz.homework.info import HomeworkInfoCreator
 from src.internal.biz.creators.biz.subject import SubjectCreator
@@ -70,54 +69,6 @@ class LessonCreator(CreatorBiz):
     @staticmethod
     def _get_str_value(existed_value: Optional[str], updated_value: Optional[str]) -> Optional[str]:
         return None if updated_value == '' else existed_value if updated_value is None else updated_value
-
-    @classmethod
-    def get_from_request(cls, lesson_request: LessonUpdateRequest) -> Lesson:
-
-        return Lesson(
-            subject=Subject(id=lesson_request.subject_id),
-            course=Course(id=lesson_request.course_id),
-            name=lesson_request.name,
-            description=lesson_request.description,
-            youtube_link=lesson_request.youtube_link,
-            datetime_start=cls._to_datetime_from_sec(lesson_request.time_start),
-            time_finish=cls._to_time_from_sec(lesson_request.time_finish)
-        )
-
-        lesson = Lesson()
-
-        if lesson_request.homework:
-            lesson.homework = HomeworkCreator().get_from_request(lesson_request.homework)
-        if lesson_request.file_links:
-            lesson.documents = [DocumentCreator().get_from_requests(link) for link in lesson_request.file_links]
-
-        lesson.id = lesson_id
-        lesson.account_teacher_id = account_teacher_id
-
-        if lesson_request.name is not None:
-            lesson.name = lesson_request.name
-
-        if lesson_request.description is not None:
-            lesson.description = lesson_request.description
-
-        if lesson_request.youtube_link is not None:
-            lesson.youtube_link = lesson_request.youtube_link
-
-        if lesson_request.lecture is not None:
-            lesson.lecture = lesson_request.lecture
-
-        if lesson_request.course_id != -1:
-            lesson.course = CourseCreator.get_from_request(lesson_request.course_id)
-
-        if lesson_request.subject_id != -1:
-            lesson.subject = SubjectCreator.get_from_request(lesson_request.subject_id)
-
-        if lesson_request.date_start != -1:
-            lesson.datetime_start = cls._to_datetime_from_sec(lesson_request.date_start)
-
-        if lesson_request.time_finish != -1:
-            lesson.time_finish = cls._to_time_from_sec(lesson_request.time_finish)
-        return lesson
 
     @classmethod
     def get_empty(cls, account_teacher_id: int) -> Lesson:

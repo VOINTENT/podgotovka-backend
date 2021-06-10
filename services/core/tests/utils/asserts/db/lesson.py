@@ -21,10 +21,19 @@ def assert_lesson_in_db(
     assert result['name'] == name
     assert result['description'] == description
     assert result['youtube_link'] == youtube_link
-    assert result['time_start'].year == time_start.year and result['time_start'].month == time_start.month and result[
-        'time_start'].day == time_start.day and result['time_start'].hour == time_start.hour and result[
-               'time_start'].minute == time_start.minute
-    assert result['time_finish'].hour == time_finish.hour and result['time_finish'].minute == time_finish.minute
+
+    if time_start is None:
+        assert result['time_start'] is None
+    else:
+        assert result['time_start'].year == time_start.year and result['time_start'].month == time_start.month and result[
+            'time_start'].day == time_start.day and result['time_start'].hour == time_start.hour and result[
+                   'time_start'].minute == time_start.minute
+
+    if time_finish is None:
+        assert result['time_finish'] is None
+    else:
+        assert result['time_finish'].hour == time_finish.hour and result['time_finish'].minute == time_finish.minute
+
     if lecture is None:
         assert result['text'] is None
     else:

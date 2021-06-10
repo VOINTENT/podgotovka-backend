@@ -3,13 +3,11 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
-from src.internal.biz.creators.biz.lesson import LessonCreator
 from src.internal.biz.creators.response.lesson_detail import LessonDetailResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
-from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest

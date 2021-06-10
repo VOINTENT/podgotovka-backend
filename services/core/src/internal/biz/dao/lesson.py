@@ -3,7 +3,6 @@ import json
 from typing import Optional, List
 
 from src.internal.biz.dao.homework.homework import HomeworkDao
-from src.internal.biz.dao.lesson_file import LessonFileDao
 from sqlalchemy import select, and_, func, Column, case, text, null
 from sqlalchemy.sql import Select
 from src.internal.biz.creators.biz.document import DocumentCreator

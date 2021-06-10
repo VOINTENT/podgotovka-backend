@@ -134,3 +134,16 @@ def test_update_lesson(client: TestClient, truncate, teacher_account_access_toke
         subject_id=TestSubjectData.id, course_id=TestCourseData.id, name='qwsdasd', description='fsdfwef',
         youtube_link='ghhfbcv', time_start=current_datetime,
         time_finish=current_time, files=[], lecture=new_lecture)
+
+
+def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_access_token, structures, courses,
+                                  subjects, lesson2):
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={},
+                            headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+
+    assert_lesson_in_db(
+        subject_id=TestLessonData2.subject.id, course_id=TestLessonData2.course.id, name=TestLessonData2.name,
+        description=TestLessonData2.description, youtube_link=TestLessonData2.youtube_link,
+        time_start=TestLessonData2.time_start,
+        time_finish=TestLessonData2.time_finish, files=[], lecture=TestLessonData2.text)
