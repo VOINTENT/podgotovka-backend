@@ -97,4 +97,4 @@ async def lesson_update(lesson_id: int,
                         lesson_request: LessonUpdateRequest,
                         account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
     lesson: Lesson = LessonCreator().get_from_request(lesson_request, lesson_id, account_teacher_request.id)
-    return LessonDetailResponseCreator().get_from_one(await LessonService.update_lesson(lesson))
+    return LessonDetailResponseCreator.get_from_one(await LessonService.update_lesson(lesson))

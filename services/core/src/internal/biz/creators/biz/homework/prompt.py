@@ -8,7 +8,8 @@ from src.internal.biz.entities.request.homeworks.test.question.prompt.add import
 
 
 class PromptCreator(CreatorBiz):
-    def get_from_request(self, prompt_request: PromptRequest) -> Prompt:
+    @staticmethod
+    def get_from_request(prompt_request: PromptRequest) -> Prompt:
         return Prompt(text=prompt_request.text)
 
     @staticmethod

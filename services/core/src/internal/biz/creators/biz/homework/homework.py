@@ -12,7 +12,8 @@ from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 
 
 class HomeworkCreator(CreatorBiz):
-    def get_from_request(self, homework_request: HomeworkAddRequest) -> Homework:
+    @staticmethod
+    def get_from_request(homework_request: HomeworkAddRequest) -> Homework:
         homework = Homework()
 
         if homework_request.homework_type == HomeworkTypeEnum.test:

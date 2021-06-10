@@ -5,7 +5,8 @@ from src.internal.biz.entities.biz.account.account import Account
 
 
 class AccountCreator(Creator):
-    def get_from_form_data(self, form_data: OAuth2PasswordRequestForm) -> Account:
+    @staticmethod
+    def get_from_form_data(form_data: OAuth2PasswordRequestForm) -> Account:
         return Account(
             email=form_data.username,
             password=form_data.password
