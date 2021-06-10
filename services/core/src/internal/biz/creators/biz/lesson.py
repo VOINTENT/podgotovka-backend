@@ -6,7 +6,7 @@ from src.internal.biz.creators.biz.base import CreatorBiz
 from src.internal.biz.creators.biz.file import DocumentCreator
 from src.internal.biz.creators.biz.homework.homework import HomeworkCreator
 from src.internal.biz.creators.biz.course import CourseCreator
-from src.internal.biz.creators.biz.homework_info import HomeworkInfoCreator
+from src.internal.biz.creators.biz.homework.info import HomeworkInfoCreator
 from src.internal.biz.creators.biz.subject import SubjectCreator
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
@@ -35,7 +35,8 @@ class LessonCreator(CreatorBiz):
             is_subscribed=record.get('lesson_is_subscribed')
         )
 
-    def get_from_request(self, lesson_request: LessonUpdateRequest,
+    @classmethod
+    def get_from_request(cls, lesson_request: LessonUpdateRequest,
                          lesson_id: int,
                          account_teacher_id: int) -> Lesson:
         lesson = Lesson()
@@ -67,18 +68,18 @@ class LessonCreator(CreatorBiz):
             lesson.subject = SubjectCreator.get_from_request(lesson_request.subject_id)
 
         if lesson_request.date_start != -1:
-            lesson.datetime_start = self.to_date_from_sec(lesson_request.date_start)
+            lesson.datetime_start = cls._to_date_from_sec(lesson_request.date_start)
 
         if lesson_request.time_finish != -1:
-            lesson.time_finish = self.to_time_from_sec(lesson_request.time_finish)
+            lesson.time_finish = cls._to_time_from_sec(lesson_request.time_finish)
         return lesson
 
     @staticmethod
-    def to_date_from_sec(sec: int) -> datetime.datetime:
+    def _to_date_from_sec(sec: int) -> datetime.datetime:
         return datetime.datetime.fromtimestamp(sec)
 
     @staticmethod
-    def to_time_from_sec(sec: int) -> datetime.time:
+    def _to_time_from_sec(sec: int) -> datetime.time:
         return datetime.time(
             hour=sec // 3600,
             minute=(sec % 3600) // 60

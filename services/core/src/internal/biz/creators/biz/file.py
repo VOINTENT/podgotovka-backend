@@ -5,7 +5,8 @@ from src.internal.biz.entities.biz.document import Document
 
 
 class DocumentCreator(CreatorBiz):
-    def get_from_record(self, record: Record) -> Document:
+    @staticmethod
+    def get_from_record(record: Record) -> Document:
         # TODO нужно имя файла!!!
         return Document("", record.get('lesson_file_link'), "", "")
 

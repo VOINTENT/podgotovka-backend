@@ -14,7 +14,8 @@ class HomeworkWithoutAnswerCreator(CreatorBiz):
             question=record.get('homework_without_answer_question')
         )
 
-    def get_from_request(self, homework_without_answer: HomeworkWithoutAnswerRequest) -> HomeworkWithoutAnswer:
+    @staticmethod
+    def get_from_request(homework_without_answer: HomeworkWithoutAnswerRequest) -> HomeworkWithoutAnswer:
         return HomeworkWithoutAnswer(question=homework_without_answer.question)
 
     @classmethod

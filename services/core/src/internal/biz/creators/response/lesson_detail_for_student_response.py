@@ -13,7 +13,8 @@ class LessonDetailForStudentResponseCreator(Creator):
             name=lesson.name,
             description=lesson.description,
             files=LessonFileSimpleResponseCreator.get_many_from_documents(lesson.documents),
-            homework=HomeworkInfoResponseCreator.get_from_homework_info(lesson.homework_info) if lesson.homework_info else None,
+            homework=HomeworkInfoResponseCreator.get_from_homework_info(
+                lesson.homework_info) if lesson.homework_info else None,
             lecture=lesson.lecture,
             is_subscribed=lesson.is_subscribed
         )

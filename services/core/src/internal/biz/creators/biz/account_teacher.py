@@ -7,7 +7,8 @@ from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 
 
 class AccountTeacherCreator(CreatorBiz):
-    def get_from_record(self, record: Record):
+    @staticmethod
+    def get_from_record(record: Record):
         return AccountTeacher(
             id=record.get('account_teacher_id'),
             hash_password=record.get('account_hash_password'),

@@ -14,7 +14,8 @@ class AnswerVariantCreator(CreatorBiz):
                              name=record.get('answer_variant_text'),
                              is_right=record.get('answer_variant_is_right'))
 
-    def get_from_request(self, question_answer_request: AnswerVariantRequest) -> AnswerVariant:
+    @staticmethod
+    def get_from_request(question_answer_request: AnswerVariantRequest) -> AnswerVariant:
         return AnswerVariant(name=question_answer_request.name,
                              is_right=question_answer_request.is_right)
 

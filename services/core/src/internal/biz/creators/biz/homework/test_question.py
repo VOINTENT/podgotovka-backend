@@ -13,7 +13,8 @@ from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 
 
 class TestQuestionCreator(CreatorBiz):
-    def get_from_request(self, test_question_request: TestQuestionRequest) -> TestQuestion:
+    @staticmethod
+    def get_from_request(test_question_request: TestQuestionRequest) -> TestQuestion:
         prompts = [PromptCreator().get_from_request(prompt)
                    for prompt in test_question_request.prompts]
         answer_type = test_question_request.answer_type

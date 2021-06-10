@@ -13,6 +13,6 @@ accounts_teacher_router = APIRouter(prefix='/accounts-teacher', tags=['Accounts 
 
 @accounts_teacher_router.post('/auth/base', response_model=TokenResponse)
 async def auth_base(form_data: OAuth2PasswordRequestForm = Depends()):
-    new_account: Account = AccountCreator().get_from_form_data(form_data)
+    new_account: Account = AccountCreator.get_from_form_data(form_data)
     token: Token = await AccountsTeacherService.auth_account_base(new_account)
-    return TokenResponseCreator().get_from_token(token)
+    return TokenResponseCreator.get_from_token(token)

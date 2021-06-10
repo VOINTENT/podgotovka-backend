@@ -9,10 +9,12 @@ from src.internal.biz.entities.request.homeworks.test.add import HomeworkTestReq
 
 
 class HomeworkTestCreator(CreatorBiz):
-    def get_from_record(self, record: Record):
+    @staticmethod
+    def get_from_record(record: Record):
         pass
 
-    def get_from_request(self, homework_test_request: HomeworkTestRequest) -> HomeworkTest:
+    @staticmethod
+    def get_from_request(homework_test_request: HomeworkTestRequest) -> HomeworkTest:
         return HomeworkTest(test_questions=[TestQuestionCreator().get_from_request(test_question)
                                             for test_question in homework_test_request.test_questions])
 
