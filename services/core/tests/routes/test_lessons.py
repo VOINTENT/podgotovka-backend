@@ -1,11 +1,14 @@
+import datetime
+
 from starlette.testclient import TestClient
 
 from tests.test_data import TestLessonData, TestLessonData2, TestLessonFileData, TestHomeworkData, TestLessonFileData2, \
-    TestAccountTeacherData
-from tests.utils.asserts.lesson import assert_lesson_simple_list_with_counts_response, \
+    TestAccountTeacherData, TestSubjectData, TestCourseData
+from tests.utils.asserts.db.lesson import assert_lesson_in_db
+from tests.utils.asserts.models.lesson import assert_lesson_simple_list_with_counts_response, \
     assert_lesson_detail_for_student_response
 from tests.utils.db import run_query
-from tests.utils.utils import get_auth_headers
+from tests.utils.utils import get_auth_headers, get_random_json
 
 
 def test_add_empty_lesson(client: TestClient, truncate, teacher_account, teacher_account_access_token):
@@ -87,3 +90,60 @@ def test_get_lesson_detail_without_homework(client: TestClient, truncate, teache
     response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/students')
     assert response.status_code == 200
     assert response.json()['homework'] is None
+
+
+def test_update_lesson_set_empty(client: TestClient, truncate, teacher_account_access_token, structures, courses,
+                                 subjects, lesson2):
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={
+        'subject_id': -1,
+        'course_id': -1,
+        'name': '',
+        'description': '',
+        'youtube_link': '',
+        'time_start': -1,
+        'time_finish': -1,
+        'files': [],
+        'lecture': ''
+    }, headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+
+    assert_lesson_in_db(
+        subject_id=None, course_id=None, name=None, description=None, youtube_link=None, time_start=None,
+        time_finish=None, files=[], lecture=None)
+
+
+def test_update_lesson(client: TestClient, truncate, teacher_account_access_token, structures, courses,
+                       subjects, lesson2):
+    current_datetime = datetime.datetime.now()
+    current_time = current_datetime.time()
+    new_lecture = get_random_json()
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={
+        'subject_id': TestSubjectData.id,
+        'course_id': TestCourseData.id,
+        'name': 'qwsdasd',
+        'description': 'fsdfwef',
+        'youtube_link': 'ghhfbcv',
+        'time_start': int(current_datetime.timestamp()),
+        'time_finish': current_time.hour * 3600 + current_time.minute * 60,
+        'files': [],
+        'lecture': new_lecture
+    }, headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+
+    assert_lesson_in_db(
+        subject_id=TestSubjectData.id, course_id=TestCourseData.id, name='qwsdasd', description='fsdfwef',
+        youtube_link='ghhfbcv', time_start=current_datetime,
+        time_finish=current_time, files=[], lecture=new_lecture)
+
+
+def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_access_token, structures, courses,
+                                  subjects, lesson2):
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={},
+                            headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+
+    assert_lesson_in_db(
+        subject_id=TestLessonData2.subject.id, course_id=TestLessonData2.course.id, name=TestLessonData2.name,
+        description=TestLessonData2.description, youtube_link=TestLessonData2.youtube_link,
+        time_start=TestLessonData2.time_start,
+        time_finish=TestLessonData2.time_finish, files=[], lecture=TestLessonData2.text)

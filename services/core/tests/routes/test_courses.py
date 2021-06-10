@@ -1,7 +1,7 @@
 from starlette.testclient import TestClient
 
 from tests.test_data import TestSubjectData, TestCourseData, TestCourseData2
-from tests.utils.asserts.course import assert_course_simple_response
+from tests.utils.asserts.models.course import assert_course_simple_response
 
 
 def test_get_all_courses(client: TestClient, truncate, structures, courses):

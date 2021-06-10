@@ -1,11 +1,11 @@
 import datetime
 from typing import Dict, Any, List, Type
 
-from tests.test_data import TestLessonData, TestCourseData, TestSubjectData, TestHomeworkData, TestLessonFileData
-from tests.utils.asserts.course import assert_course_simple_response
-from tests.utils.asserts.homework import assert_homework_info_response
-from tests.utils.asserts.lesson_file import assert_file_simple_response
-from tests.utils.asserts.subject import assert_subject_simple_response
+from tests.test_data import TestLessonData, TestCourseData, TestSubjectData
+from tests.utils.asserts.models.course import assert_course_simple_response
+from tests.utils.asserts.models.homework import assert_homework_info_response
+from tests.utils.asserts.models.lesson_file import assert_file_simple_response
+from tests.utils.asserts.models.subject import assert_subject_simple_response
 from tests.utils.asserts.utils import assert_json
 
 
