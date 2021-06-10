@@ -100,3 +100,9 @@ def create_lesson_file(id: int, name: str, file_link: str, lesson_id: int):
     run_query("""
         INSERT INTO lesson_file(id, name, file_link, lesson_id) VALUES ($1, $2, $3, $4)
     """, id, name, file_link, lesson_id)
+
+
+def create_answer_variant(id: int, name: str, is_right: bool, test_question_id: int):
+    run_query("""
+        INSERT INTO answer_variant(id, text, is_right, test_question_id) VALUES ($1, $2, $3, $4)
+    """, id, name, is_right, test_question_id)

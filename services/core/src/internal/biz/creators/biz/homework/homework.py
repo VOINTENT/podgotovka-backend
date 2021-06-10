@@ -1,7 +1,9 @@
+from typing import List
+
 from asyncpg import Record
 
 from src.internal.biz.creators.biz.base import CreatorBiz
-from src.internal.biz.creators.biz.homework.test import TestCreator
+from src.internal.biz.creators.biz.homework.test import HomeworkTestCreator
 from src.internal.biz.creators.biz.homework.without_answer import HomeworkWithoutAnswerCreator
 from src.internal.biz.entities.biz.homework.homework import Homework
 from src.internal.biz.entities.enum.homework_type import HomeworkTypeEnum
@@ -15,7 +17,7 @@ class HomeworkCreator(CreatorBiz):
 
         if homework_request.homework_type == HomeworkTypeEnum.test:
             homework.homework_type = HomeworkTypeEnum.test
-            homework.homework_test = TestCreator().get_from_request(homework_request.homework_test)
+            homework.homework_test = HomeworkTestCreator().get_from_request(homework_request.homework_test)
 
         elif homework_request.homework_type == HomeworkTypeEnum.without_answer:
             homework.homework_type = HomeworkTypeEnum.without_answer
@@ -26,5 +28,13 @@ class HomeworkCreator(CreatorBiz):
 
         return homework
 
-    def get_from_record(self, record: Record):
-        pass
+    @staticmethod
+    def get_from_record(record: Record) -> Homework:
+        return Homework(
+            id=record.get('homework_id'),
+            homework_type=record.get('homework_type')
+        )
+
+    @classmethod
+    def get_from_record_many(cls, records: List[Record]) -> List[Homework]:
+        return super().get_from_record_many(records)

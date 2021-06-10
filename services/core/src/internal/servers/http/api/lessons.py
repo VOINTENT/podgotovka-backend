@@ -61,7 +61,7 @@ async def get_my_student_lessons(
 
 
 @lessons_router.get('/{lesson_id}/students', response_model=LessonDetailForStudentResponse)
-async def get_lesson_detail(
+async def get_lesson_detail_for_student(
         lesson_id: int,
         current_account_student: Optional[AccountStudent] = Depends(get_optional_current_account_student)):
     lesson = await LessonService.get_lesson_detail_for_student(

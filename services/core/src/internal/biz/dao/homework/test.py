@@ -1,7 +1,7 @@
 from typing import Optional, List
 
-from src.internal.biz.creators.biz.homework.question_answer_variant import AnswerVariantCreator
-from src.internal.biz.creators.biz.homework.question_prompt import PromptCreator
+from src.internal.biz.creators.biz.homework.answer_variant import AnswerVariantCreator
+from src.internal.biz.creators.biz.homework.prompt import PromptCreator
 from src.internal.biz.dao.base import BaseDao
 from src.internal.biz.entities.biz.homework.answer_variant import AnswerVariant
 from src.internal.biz.entities.biz.homework.prompt import Prompt
