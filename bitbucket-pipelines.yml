@@ -50,7 +50,7 @@ pipelines:
             - ssh $USER@$HOST "~/services/core/venv/bin/pip install -r ~/services/core/requirements.txt"
 
             - echo 'Applying migrations...'
-            - $USER@$HOST "export PODGOTOVKA_DB_HOST=$PODGOTOVKA_DB_HOST &&
+            - ssh $USER@$HOST "export PODGOTOVKA_DB_HOST=$PODGOTOVKA_DB_HOST &&
               export PODGOTOVKA_DB_PORT=$PODGOTOVKA_DB_PORT &&
               export PODGOTOVKA_DB_USER=$PODGOTOVKA_DB_USER &&
               export PODGOTOVKA_DB_PASSWORD=$PODGOTOVKA_DB_PASSWORD &&
