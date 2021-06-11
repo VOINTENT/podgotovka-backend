@@ -34,7 +34,7 @@ class LessonDao(BaseDao):
 
     async def get(self, lesson_id: int) -> Optional[Lesson]:
         query = select(
-            self.__class__._get_simple_select()
+            self.__class__._get_simple_select_columns()
         ).select_from(
             self.__class__._get_joined_for_select()
         ).where(and_(
@@ -82,8 +82,10 @@ class LessonDao(BaseDao):
 
         return lesson
 
-    async def get_published_lessons(self, limit: int, offset: int, date_start: datetime.datetime, order: OrderEnum,
-                                    course_id: int, subject_id: int, account_student_id: Optional[int] = None):
+    async def get_published_lessons(
+            self, limit: int, offset: int, date_start: Optional[datetime.datetime], order: Optional[OrderEnum],
+            course_id: Optional[int], subject_id: Optional[int], date_finish: Optional[datetime.datetime],
+            account_student_id: Optional[int] = None):
         query = select([
             *self.__class__._get_columns_id_name(),
             lesson_table.c.created_at.label('lesson_created_at'),
@@ -99,41 +101,59 @@ class LessonDao(BaseDao):
                     lesson_view_table.c.account_student_id == account_student_id
                 )
             )
-        ).where(
-            lesson_table.c.is_published.is_(True)
-        ).limit(limit).offset(offset)
+        )
 
-        if date_start:
-            query = query.where(lesson_table.c.time_start == date_start)
+        query = self.__class__._add_is_published_condition(query)
+        query = self.__class__._add_conditions(
+            query, date_start=date_start, date_finish=date_finish, course_id=course_id, subject_id=subject_id)
+        query = self.__class__._add_pagination(query, limit, offset)
+        query = self.__class__._add_order(query, order)
 
-        if course_id:
-            query = query.where(lesson_table.c.course_id == course_id)
+        rows = await self.fetchall(query)
+        return LessonCreator.get_from_record_many(rows)
 
-        if subject_id:
-            query = query.where(lesson_table.c.subject_id == subject_id)
+    async def get_published_lessons_by_teacher(
+            self, account_teacher_id: int, limit: int, offset: int, date_start: Optional[datetime.datetime],
+            date_finish: Optional[datetime.datetime], order: Optional[OrderEnum], course_id: Optional[int],
+            subject_id: Optional[int]) -> List[Lesson]:
+        query = select([
+            *self.__class__._get_columns_id_name(),
+            lesson_table.c.created_at.label('lesson_created_at'),
+            course_table.c.id.label('course_id'), course_table.c.name.label('course_name'),
+            subject_table.c.id.label('subject_id'), subject_table.c.name.label('subject_name'),
+            lesson_table.c.time_start.label('lesson_datetime_start'),
+            lesson_table.c.time_finish.label('lesson_time_finish')
+        ]).select_from(
+            lesson_table.join(course_table).join(subject_table)
+        )
 
-        if order:
-            if order.value == OrderEnum.asc:
-                query = query.order_by(lesson_table.c.created_at)
-            elif order.value == OrderEnum.desc:
-                query = query.order_by(lesson_table.c.created_at)
-            else:
-                raise TypeError
-        else:
-            query = query.order_by(lesson_table.c.created_at)
+        query = self.__class__._add_is_published_condition(query)
+        query = self.__class__._add_conditions(
+            query, date_start=date_start, date_finish=date_finish, course_id=course_id, subject_id=subject_id,
+            account_teacher_id=account_teacher_id)
+        query = self.__class__._add_pagination(query, limit, offset)
+        query = self.__class__._add_order(query, order)
 
         rows = await self.fetchall(query)
 
         return LessonCreator.get_from_record_many(rows)
 
-    async def get_count_last(self, max_datetime: datetime.datetime) -> int:
+    async def get_count_last(self, max_datetime: datetime.datetime, account_teacher_id: Optional[int] = None,
+                             course_id: Optional[int] = None, subject_id: Optional[int] = None) -> int:
         query = select([func.count(lesson_table.c.id)]).select_from(lesson_table). \
             where(lesson_table.c.created_at < max_datetime)
+
+        query = self.__class__._add_conditions(query, account_teacher_id=account_teacher_id, course_id=course_id,
+                                               subject_id=subject_id)
         return await self.fetchval(query)
 
-    async def get_count_next(self, min_datetime: datetime.datetime) -> int:
+    async def get_count_next(self, min_datetime: datetime.datetime, account_teacher_id: Optional[int] = None,
+                             course_id: Optional[int] = None, subject_id: Optional[int] = None) -> int:
         query = select([func.count(lesson_table.c.id)]).select_from(lesson_table).where(
             lesson_table.c.created_at > min_datetime)
+
+        query = self.__class__._add_conditions(query, account_teacher_id=account_teacher_id, course_id=course_id,
+                                               subject_id=subject_id)
 
         return await self.fetchval(query)
 
@@ -207,11 +227,10 @@ class LessonDao(BaseDao):
     def _get_columns_id_name() -> List[Column]:
         return [lesson_table.c.id.label('lesson_id'), lesson_table.c.name.label('lesson_name')]
 
-    @staticmethod
-    def _get_simple_select():
+    @classmethod
+    def _get_simple_select_columns(cls) -> List[Column]:
         return [
-            lesson_table.c.id.label('lesson_id'),
-            lesson_table.c.name.label('lesson_name'),
+            *cls._get_columns_id_name(),
             lesson_table.c.description.label('lesson_description'),
             lesson_table.c.youtube_link.label('lesson_youtube_link'),
             lesson_table.c.time_start.label('lesson_datetime_start'),
@@ -224,9 +243,51 @@ class LessonDao(BaseDao):
             lesson_table.c.account_teacher_id.label('account_teacher_id'),
 
             subject_table.c.name.label('subject_name'),
-            course_table.c.name.label('course_name'),
+            course_table.c.name.label('course_name')
         ]
 
     @staticmethod
     def _get_joined_for_select():
         return lesson_table.outerjoin(subject_table).outerjoin(course_table)
+
+    @staticmethod
+    def _add_is_published_condition(query: Select) -> Select:
+        return query.where(lesson_table.c.is_published.is_(True))
+
+    @staticmethod
+    def _add_pagination(query: Select, limit: int, offset: int) -> Select:
+        return query.limit(limit).offset(offset)
+
+    @staticmethod
+    def _add_conditions(query: Select, date_start: Optional[datetime.datetime] = None,
+                        date_finish: Optional[datetime.datetime] = None, course_id: Optional[int] = None,
+                        subject_id: Optional[int] = None, account_teacher_id: Optional[int] = None) -> Select:
+        if date_start:
+            query = query.where(lesson_table.c.time_start >= date_start)
+
+        if date_finish:
+            query = query.where(lesson_table.c.time_start <= date_finish)
+
+        if course_id:
+            query = query.where(lesson_table.c.course_id == course_id)
+
+        if subject_id:
+            query = query.where(lesson_table.c.subject_id == subject_id)
+
+        if account_teacher_id:
+            query = query.where(lesson_table.c.account_teacher_id == account_teacher_id)
+
+        return query
+
+    @staticmethod
+    def _add_order(query: Select, order: Optional[OrderEnum] = None) -> Select:
+        if order:
+            if order.value == OrderEnum.asc:
+                query = query.order_by(lesson_table.c.created_at)
+            elif order.value == OrderEnum.desc:
+                query = query.order_by(lesson_table.c.created_at)
+            else:
+                raise TypeError
+        else:
+            query = query.order_by(lesson_table.c.created_at)
+        return query

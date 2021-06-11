@@ -15,7 +15,7 @@ def test_get_all_subjects(client: TestClient, truncate, subjects):
     assert_subject_simple_response(result[1], id=TestSubjectData2.id, name=TestSubjectData2.name)
 
 
-def test_get_all_subjects_filter_course(client: TestClient, truncate, structures, subjects, courses, subject_course):
+def test_get_all_subjects_filter_course(client: TestClient, truncate, subjects, courses, subject_course):
     response = client.get(f'/core/v1/subjects?course_id={TestCourseData.id}')
     assert response.status_code == 200
 

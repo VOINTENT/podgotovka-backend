@@ -14,4 +14,3 @@ class LessonSimpleResponse(BaseResponseModel):
     subject: SubjectSimpleResponse
     start_time: int = Field(..., example=123456789)
     finish_time: Optional[int] = Field(None, example=560)
-    is_watched: bool = Field(..., example=True)
