@@ -11,7 +11,7 @@ from src.internal.servers.http.exceptions.account import AccountsExceptionEnum
 class AccountsStudentService:
     @staticmethod
     async def get_by_id_simple(account_student_id: int) -> AccountStudent:
-        pass
+        return await AccountStudentDao().get_by_id(account_student_id)
 
     @staticmethod
     async def register_account(account_student: AccountStudent) -> Token:

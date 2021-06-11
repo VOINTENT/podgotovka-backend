@@ -9,6 +9,19 @@ from src.schema.meta import account_student_table
 
 
 class AccountStudentDao(BaseDao):
+    async def get_by_id(self, account_student_id: int) -> Optional[AccountStudent]:
+        query = select([
+            account_student_table.c.id.label('account_student_id'),
+            account_student_table.c.hash_password.label('account_hash_password'),
+            account_student_table.c.email.label('account_email')
+        ]).select_from(account_student_table). \
+            where(account_student_table.c.id == account_student_id)
+
+        row = await self.fetchone(query)
+        if not row:
+            return None
+        return AccountStudentCreator().get_from_record(row)
+
     async def add(self, account_student: AccountStudent) -> AccountStudent:
         query = account_student_table.insert(). \
             values(email=account_student.email,
