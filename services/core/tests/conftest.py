@@ -8,10 +8,11 @@ from tests.test_data import TestAccountTeacherData, TestSubjectData, TestSubject
     TestSubjectCourseData, TestStructureData, TestStructureData2, TestStructureData3, TestLessonData, TestLessonData2, \
     TestHomeworkData, TestHomeworkTestData, TestQuestionData, TestQuestionData2, TestLessonFileData, \
     TestLessonFileData2, TestAnswerVariantData, TestAnswerVariantData2, TestAnswerVariantData3, TestAnswerVariantData4, \
-    TestAccountStudentData, TestAccountStudentVkData
+    TestAccountStudentData, TestAccountStudentVkData, TestSubjectCourseData2, TestSubjectCourseData3
 from tests.utils.db import truncate_tables, create_account_teacher, create_subject, create_course, \
     create_subject_course, create_structure, create_lesson, create_homework, create_homework_test, create_test_question, \
-    create_lesson_file, create_answer_variant, create_account_student, create_account_student_vk
+    create_lesson_file, create_answer_variant, create_account_student, create_account_student_vk, \
+    create_subject_course_lead, create_subject_course_subscribed, create_subject_course_with_id
 
 
 @pytest.fixture(scope='session')
@@ -28,7 +29,7 @@ def truncate():
 
 
 @pytest.fixture()
-def teacher_account():
+def account_teacher():
     create_account_teacher(
         id=TestAccountTeacherData.id,
         edited_at=TestAccountTeacherData.edited_at,
@@ -62,10 +63,28 @@ def account_student_vk():
 
 
 @pytest.fixture()
-def teacher_account_access_token(teacher_account, client: TestClient):
+def access_token_teacher(account_teacher, client: TestClient):
     response = client.post('/core/v1/accounts-teacher/auth/base', data={
         'username': TestAccountTeacherData.email,
         'password': TestAccountTeacherData.password
+    })
+    return response.json()['access_token']
+
+
+@pytest.fixture()
+def access_token_student(account_student, client: TestClient):
+    response = client.post('/core/v1/accounts-student/auth/base', data={
+        'username': TestAccountStudentData.email,
+        'password': TestAccountStudentData.password
+    })
+    return response.json()['access_token']
+
+
+@pytest.fixture()
+def access_token_student_vk(account_student_vk, client: TestClient):
+    response = client.post('/core/v1/accounts-student/auth/vk', json={
+        'code': TestAccountStudentVkData.vk_code
+
     })
     return response.json()['access_token']
 
@@ -85,6 +104,32 @@ def courses():
 @pytest.fixture()
 def subject_course():
     create_subject_course(subject_id=TestSubjectCourseData.subject_id, course_id=TestSubjectCourseData.course_id)
+
+
+@pytest.fixture()
+def subject_course_with_id():
+    create_subject_course_with_id(id=TestSubjectCourseData2.id,
+                                  subject_id=TestSubjectCourseData2.subject_id,
+                                  course_id=TestSubjectCourseData2.course_id)
+    create_subject_course_with_id(id=TestSubjectCourseData3.id,
+                                  subject_id=TestSubjectCourseData3.subject_id,
+                                  course_id=TestSubjectCourseData3.course_id)
+
+
+@pytest.fixture()
+def subject_course_subscribed():
+    create_subject_course_subscribed(account_student_id=TestAccountStudentData.id,
+                                     subject_course_id=TestSubjectCourseData2.id)
+    create_subject_course_subscribed(account_student_id=TestAccountStudentData.id,
+                                     subject_course_id=TestSubjectCourseData3.id)
+
+
+@pytest.fixture()
+def subject_course_lead():
+    create_subject_course_lead(account_teacher_id=TestAccountTeacherData.id,
+                               subject_course_id=TestSubjectCourseData2.id)
+    create_subject_course_lead(account_teacher_id=TestAccountTeacherData.id,
+                               subject_course_id=TestSubjectCourseData3.id)
 
 
 @pytest.fixture()

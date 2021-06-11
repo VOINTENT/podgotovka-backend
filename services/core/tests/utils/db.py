@@ -41,7 +41,8 @@ def truncate_tables():
             prompt, 
             answer_variant, 
             lesson_view, 
-            subject_course_subscription
+            subject_course_subscription,
+            subject_course_lead
     """)
 
 
@@ -79,6 +80,24 @@ def create_subject_course(subject_id: int, course_id: int) -> None:
     run_query("""
         INSERT INTO subject_course(subject_id, course_id) VALUES ($1, $2)
     """, subject_id, course_id)
+
+
+def create_subject_course_with_id(id: int, subject_id: int, course_id: int) -> None:
+    run_query("""
+        INSERT INTO subject_course(id, subject_id, course_id) VALUES ($1, $2, $3)
+    """, id, subject_id, course_id)
+
+
+def create_subject_course_lead(account_teacher_id: int, subject_course_id: int) -> None:
+    run_query("""
+            INSERT INTO subject_course_lead(account_teacher_id, subject_course_id) VALUES ($1, $2)
+        """, account_teacher_id, subject_course_id)
+
+
+def create_subject_course_subscribed(account_student_id: int, subject_course_id: int) -> None:
+    run_query("""
+            INSERT INTO subject_course_subscription(account_student_id, subject_course_id) VALUES ($1, $2)
+        """, account_student_id, subject_course_id)
 
 
 def create_structure(id: int, name: str) -> None:

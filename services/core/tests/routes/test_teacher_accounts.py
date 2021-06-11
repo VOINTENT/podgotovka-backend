@@ -3,7 +3,7 @@ from starlette.testclient import TestClient
 from tests.test_data import TestAccountTeacherData
 
 
-def test_auth_base(client: TestClient, truncate, teacher_account):
+def test_auth_base(client: TestClient, truncate, account_teacher):
     response = client.post('/core/v1/accounts-teacher/auth/base', data={
       'username': TestAccountTeacherData.email,
       'password': TestAccountTeacherData.password

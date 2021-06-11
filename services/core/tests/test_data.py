@@ -73,6 +73,20 @@ class TestSubjectCourseData:
     course_id = TestCourseData.id
 
 
+class TestSubjectCourseData2:
+    id = get_random_int()
+    subject_id = TestSubjectData.id
+    course_id = TestCourseData.id
+    name = f"{TestSubjectData.name} ({TestCourseData.name})"
+
+
+class TestSubjectCourseData3:
+    id = get_random_int()
+    subject_id = TestSubjectData2.id
+    course_id = TestCourseData.id
+    name = f"{TestSubjectData2.name} ({TestCourseData.name})"
+
+
 class TestHomeworkTestData:
     id = get_random_int()
 
