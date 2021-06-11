@@ -3,14 +3,17 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
+from src.internal.biz.creators.response.just_id import JustIdResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_edit import LessonDetailForEditResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
+from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
+from src.internal.biz.entities.response.common.just_id import JustIdResponse
 from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
 from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
 from src.internal.biz.entities.response.lesson.only_name import LessonOnlyNameResponse
@@ -107,10 +110,10 @@ async def unsubscribe_to_subject_and_course(lesson_id: int,
     pass
 
 
-@lessons_router.post('/', response_model=LessonDetailForEditResponse)
+@lessons_router.post('/', response_model=JustIdResponse)
 async def lesson_create(account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
-    lesson = await LessonService.create_empty_lesson(account_teacher_id=account_teacher_request.id)
-    return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
+    lesson: Lesson = await LessonService.create_empty_lesson(account_teacher_id=account_teacher_request.id)
+    return JustIdResponseCreator.get_from_id(lesson.id)
 
 
 @lessons_router.patch('/{lesson_id}', response_model=LessonDetailForEditResponse)

@@ -8,6 +8,7 @@ from sqlalchemy.sql import Select
 from src.internal.biz.creators.biz.document import DocumentCreator
 from src.internal.biz.entities.biz.document import Document
 from src.internal.biz.entities.enum.homework_type import HomeworkTypeEnum
+from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.schema.meta import lesson_table, course_table, subject_table, lesson_view_table, lesson_file_table, \
     subject_course_subscription_table, homework_table, homework_test_table, test_question_table, subject_course_table
@@ -51,7 +52,8 @@ class LessonDao(BaseDao):
 
     async def add(self, lesson: Lesson) -> Lesson:
         query = lesson_table.insert().values(
-            account_teacher_id=lesson.account_teacher_id
+            account_teacher_id=lesson.account_teacher_id,
+            status=lesson.status
         ).returning(
             lesson_table.c.id.label('lesson_id')
         )
@@ -237,11 +239,11 @@ class LessonDao(BaseDao):
         return [
             *cls._get_columns_id_name(),
             lesson_table.c.description.label('lesson_description'),
+            lesson_table.c.status.label('lesson_status'),
             lesson_table.c.youtube_link.label('lesson_youtube_link'),
             lesson_table.c.time_start.label('lesson_datetime_start'),
             lesson_table.c.time_finish.label('lesson_time_finish'),
             lesson_table.c.text.label('lesson_lecture'),
-            lesson_table.c.is_published.label('lesson_is_published'),
             lesson_table.c.subject_id.label('subject_id'),
             lesson_table.c.course_id.label('course_id'),
             lesson_table.c.account_teacher_id.label('account_teacher_id'),
@@ -256,7 +258,7 @@ class LessonDao(BaseDao):
 
     @staticmethod
     def _add_is_published_condition(query: Select) -> Select:
-        return query.where(lesson_table.c.is_published.is_(True))
+        return query.where(lesson_table.c.status == LessonStatusEnum.published)
 
     @staticmethod
     def _add_pagination(query: Select, limit: int, offset: int) -> Select:

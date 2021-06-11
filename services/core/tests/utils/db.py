@@ -106,14 +106,14 @@ def create_subject_course_subscribed(account_student_id: int, subject_course_id:
 
 def create_lesson(
         id: int, name: str, description: str, youtube_link: str, time_start: datetime.datetime,
-        time_finish: datetime.time, text: str, is_published: bool, subject_id, course_id: int, homework_id: int,
+        time_finish: datetime.time, text: str, status: bool, subject_id, course_id: int, homework_id: int,
         account_teacher_id: int
 ):
     run_query(
         """
-        INSERT INTO lesson(id, name, description, youtube_link, time_start, time_finish, text, is_published, subject_id,
+        INSERT INTO lesson(id, name, description, youtube_link, time_start, time_finish, text, status, subject_id,
         course_id, homework_id, account_teacher_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        """, id, name, description, youtube_link, time_start, time_finish, text, is_published, subject_id, course_id,
+        """, id, name, description, youtube_link, time_start, time_finish, text, status, subject_id, course_id,
         homework_id, account_teacher_id
     )
 
