@@ -46,16 +46,20 @@ def truncate_tables():
     """)
 
 
-def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str,
+                           last_name: str, middle_name: str, description: str) -> None:
     run_query("""
-        INSERT INTO account_teacher(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
-    """, id, edited_at, email, name, hash_password)
+        INSERT INTO account_teacher(id, edited_at, email, name, hash_password, last_name, middle_name, description) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    """, id, edited_at, email, name, hash_password, last_name, middle_name, description)
 
 
-def create_account_student(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+def create_account_student(id: int, edited_at, email: str, name: str, hash_password: str,
+                           last_name: str, middle_name: str, description: str) -> None:
     run_query("""
-        INSERT INTO account_student(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
-    """, id, edited_at, email, name, hash_password)
+        INSERT INTO account_student(id, edited_at, email, name, hash_password, last_name, middle_name, description) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    """, id, edited_at, email, name, hash_password, last_name, middle_name, description)
 
 
 def create_account_student_vk(id: int, edited_at, email: str, name: str, last_name: str, vk_id: int) -> None:

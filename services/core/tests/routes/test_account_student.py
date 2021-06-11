@@ -2,6 +2,7 @@ from starlette.testclient import TestClient
 
 from tests.test_data import TestAccountStudentData, TestAccountStudentVkData
 from tests.utils.db import run_query
+from tests.utils.utils import get_auth_headers
 
 
 def test_account_student_auth_base(client: TestClient, truncate, account_student):
@@ -69,3 +70,20 @@ def test_account_student_reg_vk(client: TestClient, truncate):
     assert student_info[1] == TestAccountStudentVkData.name
     assert student_info[2] == TestAccountStudentVkData.last_name
     assert student_info[3] == TestAccountStudentVkData.vk_id
+
+
+def test_get_detail_info(client: TestClient, truncate, account_student, access_token_student):
+    response = client.get('/core/v1/accounts-student/me', headers=get_auth_headers(access_token_student))
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert result['id'] == TestAccountStudentData.id
+    assert result['name'] == TestAccountStudentData.name
+    assert result['last_name'] == TestAccountStudentData.last_name
+    assert result['middle_name'] == TestAccountStudentData.middle_name
+    assert result['email'] == TestAccountStudentData.email
+    assert result['description'] == TestAccountStudentData.description
+    assert result['photo_link'] is None
+    assert result['vk_id'] is None

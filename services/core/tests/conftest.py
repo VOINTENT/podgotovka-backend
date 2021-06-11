@@ -35,7 +35,10 @@ def account_teacher():
         edited_at=TestAccountTeacherData.edited_at,
         email=TestAccountTeacherData.email,
         name=TestAccountTeacherData.name,
-        hash_password=TestAccountTeacherData.hash_password
+        hash_password=TestAccountTeacherData.hash_password,
+        last_name=TestAccountTeacherData.last_name,
+        description=TestAccountTeacherData.description,
+        middle_name=TestAccountTeacherData.middle_name,
     )
 
 
@@ -46,7 +49,10 @@ def account_student():
         edited_at=TestAccountStudentData.edited_at,
         email=TestAccountStudentData.email,
         name=TestAccountStudentData.name,
-        hash_password=TestAccountStudentData.hash_password
+        hash_password=TestAccountStudentData.hash_password,
+        last_name=TestAccountStudentData.last_name,
+        description=TestAccountStudentData.description,
+        middle_name=TestAccountStudentData.middle_name,
     )
 
 

@@ -160,10 +160,10 @@ def test_get_my_teacher_lessons(client: TestClient, truncate, access_token_teach
     )
 
 
-def test_get_lesson_detail_for_edit(client: TestClient, truncate, teacher_account_access_token, courses, subjects,
+def test_get_lesson_detail_for_edit(client: TestClient, truncate, access_token_teacher, courses, subjects,
                                     lesson2):
     response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/teachers/for-edit',
-                          headers=get_auth_headers(teacher_account_access_token))
+                          headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     response_json = response.json()
