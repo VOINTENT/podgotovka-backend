@@ -15,11 +15,14 @@ from src.internal.biz.entities.response.lesson.detail import LessonDetailRespons
 from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
 from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
 from src.internal.biz.entities.response.lesson.only_name import LessonOnlyNameResponse
+from src.internal.biz.entities.response.lesson.simple_watched_with_counts import \
+    LessonSimpleWatchedListWithCountsResponse
 from src.internal.biz.entities.response.lesson.simple_with_counts import LessonSimpleListWithCountsResponse
 from src.internal.biz.services.lesson import LessonService
 from src.internal.servers.http.depends.auth import get_current_account_student, get_optional_current_account_student, \
     get_current_account_teacher
-from src.internal.servers.http.depends.filters import get_date_start, get_order, get_course_id, get_subject_id
+from src.internal.servers.http.depends.filters import get_date_start, get_order, get_course_id, get_subject_id, \
+    get_date_finish
 from src.internal.servers.http.depends.pagination import PaginationParams
 
 lessons_router = APIRouter(prefix='/lessons', tags=['Lessons'])
@@ -27,13 +30,14 @@ lessons_router = APIRouter(prefix='/lessons', tags=['Lessons'])
 
 @lessons_router.get('/', response_model=LessonSimpleListWithCountsResponse)
 async def get_published_lessons(date_start: datetime = Depends(get_date_start),
+                                date_finish: datetime = Depends(get_date_finish),
                                 pagination_params: PaginationParams = Depends(),
                                 order: OrderEnum = Depends(get_order),
                                 course_id: int = Depends(get_course_id),
                                 subject_id: int = Depends(get_subject_id)):
     lessons_with_counts: LessonsWithCounts = await LessonService.get_published_lessons_with_counts(
         limit=pagination_params.limit, skip=pagination_params.skip, date_start=date_start, order=order,
-        course_id=course_id, subject_id=subject_id)
+        course_id=course_id, subject_id=subject_id, date_finish=date_finish)
     return LessonSimpleListWithCountsResponseCreator.get_from_lessons_with_counts(lessons_with_counts)
 
 
@@ -41,14 +45,18 @@ async def get_published_lessons(date_start: datetime = Depends(get_date_start),
 async def get_my_teacher_lessons(
         account_teacher: AccountTeacher = Depends(get_current_account_teacher),
         date_start: datetime = Depends(get_date_start),
+        date_finish: datetime = Depends(get_date_finish),
         pagination_params: PaginationParams = Depends(),
         order: OrderEnum = Depends(get_order),
         course_id: int = Depends(get_course_id),
         subject_id: int = Depends(get_subject_id)):
-    pass
+    lessons_with_counts: LessonsWithCounts = await LessonService.get_lessons_for_teacher(
+        account_teacher_id=account_teacher.id, limit=pagination_params.limit, skip=pagination_params.skip,
+        date_start=date_start, date_finish=date_finish, order=order, course_id=course_id, subject_id=subject_id)
+    return LessonSimpleListWithCountsResponseCreator.get_from_lessons_with_counts(lessons_with_counts)
 
 
-@lessons_router.get('/my/students', response_model=LessonSimpleListWithCountsResponse)
+@lessons_router.get('/my/students', response_model=LessonSimpleWatchedListWithCountsResponse)
 async def get_my_student_lessons(
         account_student: AccountStudent = Depends(get_current_account_student),
         date_start: datetime = Depends(get_date_start),

@@ -26,10 +26,22 @@ async def _run(query: str, *args):
 
 def truncate_tables():
     run_query("""
-        TRUNCATE TABLE account_teacher, account_student, structure, course, subject, subject_course, lesson, 
-        lesson_file, homework, homework_without_answer, homework_test, test_question, prompt, 
-        answer_variant, lesson_view, subject_course_subscription,
-        subject_course_subscription
+        TRUNCATE TABLE 
+            account_teacher, 
+            account_student, 
+            course, 
+            subject, 
+            subject_course, 
+            lesson, 
+            lesson_file, 
+            homework, 
+            homework_without_answer, 
+            homework_test, 
+            test_question, 
+            prompt, 
+            answer_variant, 
+            lesson_view, 
+            subject_course_subscription
     """)
 
 

@@ -58,7 +58,7 @@ pipelines:
 
             - echo 'Updating supervisor configs...'
             - myenv="PODGOTOVKA_API_TITLE=\"$PODGOTOVKA_API_TITLE\",
-              PODGOTOVKA_API_DESCRIPTION=\"PODGOTOVKA_API_DESCRIPTION\",
+              PODGOTOVKA_API_DESCRIPTION=\"$PODGOTOVKA_API_DESCRIPTION\",
               PODGOTOVKA_API_VERSION=\"$PODGOTOVKA_API_VERSION\",
               PODGOTOVKA_DEBUG=\"$PODGOTOVKA_DEBUG\",
               PODGOTOVKA_DB_HOST=\"$PODGOTOVKA_DB_HOST\",
