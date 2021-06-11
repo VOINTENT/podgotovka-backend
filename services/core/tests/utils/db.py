@@ -39,6 +39,18 @@ def create_account_teacher(id: int, edited_at, email: str, name: str, hash_passw
     """, id, edited_at, email, name, hash_password)
 
 
+def create_account_student(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+    run_query("""
+        INSERT INTO account_student(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
+    """, id, edited_at, email, name, hash_password)
+
+
+def create_account_student_vk(id: int, edited_at, email: str, name: str, last_name: str, vk_id: int) -> None:
+    run_query("""
+        INSERT INTO account_student(id, edited_at, email, name, last_name, vk_id) VALUES ($1, $2, $3, $4, $5, $6)
+    """, id, edited_at, email, name, last_name, vk_id)
+
+
 def create_subject(id: int, name: str) -> None:
     run_query("""
         INSERT INTO subject(id, name) VALUES ($1, $2);

@@ -14,3 +14,8 @@ class Account(ABC):
 
     def is_password_valid(self, password: str) -> bool:
         return CryptDriver.context.verify(password, self.hash_password)
+
+    def create_hash_password(self) -> None:
+        if not self.password:
+            return
+        self.hash_password = CryptDriver.context.hash(self.password)
