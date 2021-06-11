@@ -12,7 +12,9 @@ from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.biz.entities.response.lesson.detail import LessonDetailResponse
+from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
 from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
+from src.internal.biz.entities.response.lesson.only_name import LessonOnlyNameResponse
 from src.internal.biz.entities.response.lesson.simple_with_counts import LessonSimpleListWithCountsResponse
 from src.internal.biz.services.lesson import LessonService
 from src.internal.servers.http.depends.auth import get_current_account_student, get_optional_current_account_student, \
@@ -65,6 +67,18 @@ async def get_lesson_detail_for_student(
     lesson = await LessonService.get_lesson_detail_for_student(
         lesson_id, current_account_student.id if current_account_student else None)
     return LessonDetailForStudentResponseCreator.get_from_lesson(lesson)
+
+
+@lessons_router.get('/{lesson_id}/teachers/for-edit', response_model=LessonDetailForEditResponse)
+async def get_lesson_detail_for_edit():
+    pass
+
+
+@lessons_router.get('/teachers/simple', response_model=LessonOnlyNameResponse)
+async def get_lessons_names(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
+                            course_id: int = Depends(get_course_id),
+                            subject_id: int = Depends(get_subject_id)):
+    pass
 
 
 @lessons_router.post('/{lesson_id}/watched', response_model=bool)

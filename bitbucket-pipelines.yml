@@ -71,6 +71,9 @@ pipelines:
               PODGOTOVKA_SECRET_KEY=\"$PODGOTOVKA_SECRET_KEY\",
               PODGOTOVKA_ENCRYPT_ALGORITHM=\"$PODGOTOVKA_ENCRYPT_ALGORITHM\",
               PODGOTOVKA_CURRENT_URL=\"$PODGOTOVKA_CURRENT_URL\",
+              PODGOTOVKA_IS_TEST=\"$PODGOTOVKA_IS_TEST\",
+              PODGOTOVKA_VK_APP_ID=\"$PODGOTOVKA_VK_APP_ID\",
+              PODGOTOVKA_VK_APP_SECREY_KEY=\"$PODGOTOVKA_VK_APP_SECREY_KEY\",
               PODGOTOVKA_FILES_LINK=\"$PODGOTOVKA_FILES_LINK\""
 
             - ssh $USER@$HOST "echo 'environment=$myenv' >> ~/configs/supervisor/core.conf"
