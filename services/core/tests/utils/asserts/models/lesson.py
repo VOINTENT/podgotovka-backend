@@ -6,7 +6,7 @@ from tests.utils.asserts.models.course import assert_course_simple_response
 from tests.utils.asserts.models.homework import assert_homework_info_response
 from tests.utils.asserts.models.lesson_file import assert_file_simple_response
 from tests.utils.asserts.models.subject import assert_subject_simple_response
-from tests.utils.asserts.utils import assert_json
+from tests.utils.asserts.utils import assert_json, assert_datetime, assert_time
 
 
 def assert_lesson_simple_list_with_counts_response(response: Dict[str, Any], count_last: int, count_next: int,
@@ -47,3 +47,22 @@ def assert_lesson_detail_for_student_response(
 
     assert_json(response['lecture'], lecture)
     assert response['is_subscribed'] is is_subscribed
+
+
+def assert_lesson_detail_for_edit_response(
+        response: Dict[str, Any], id: int, name: str, description: str, files: List[List[Any]],
+        lecture: str, subject: Dict[str, Any], course: Dict[str, Any], youtube_link: str, time_start: datetime.datetime,
+        time_finish: datetime.time, status: str
+):
+    assert response['id'] == id
+    assert response['name'] == name
+    assert response['description'] == description
+    assert response['youtube_link'] == youtube_link
+    assert response['status'] == status
+    assert_json(response['lecture'], lecture)
+    assert_subject_simple_response(response['subject'], id=subject['id'], name=subject['name'])
+    assert_course_simple_response(response['course'], id=course['id'], name=course['name'])
+    assert_datetime(time_start, response['time_start'])
+    assert_time(time_finish, response['time_finish'])
+    for file_simple_response, file in zip(response['files'], files):
+        assert_file_simple_response(file_simple_response, name=file[0], file_link=file[1])

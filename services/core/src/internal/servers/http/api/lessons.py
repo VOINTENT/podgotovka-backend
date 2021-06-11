@@ -3,7 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends
 
-from src.internal.biz.creators.response.lesson_detail import LessonDetailResponseCreator
+from src.internal.biz.creators.response.lesson_detail_for_edit import LessonDetailForEditResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
@@ -11,7 +11,6 @@ from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
-from src.internal.biz.entities.response.lesson.detail import LessonDetailResponse
 from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
 from src.internal.biz.entities.response.lesson.detail_for_student import LessonDetailForStudentResponse
 from src.internal.biz.entities.response.lesson.only_name import LessonOnlyNameResponse
@@ -78,8 +77,10 @@ async def get_lesson_detail_for_student(
 
 
 @lessons_router.get('/{lesson_id}/teachers/for-edit', response_model=LessonDetailForEditResponse)
-async def get_lesson_detail_for_edit():
-    pass
+async def get_lesson_detail_for_edit(lesson_id: int,
+                                     _: AccountTeacher = Depends(get_current_account_teacher)):
+    lesson = await LessonService.get_lesson_detail_for_edit(lesson_id)
+    return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
 
 
 @lessons_router.get('/teachers/simple', response_model=LessonOnlyNameResponse)
@@ -106,15 +107,15 @@ async def unsubscribe_to_subject_and_course(lesson_id: int,
     pass
 
 
-@lessons_router.post('/', response_model=LessonDetailResponse)
+@lessons_router.post('/', response_model=LessonDetailForEditResponse)
 async def lesson_create(account_teacher_request: AccountTeacher = Depends(get_current_account_teacher)):
     lesson = await LessonService.create_empty_lesson(account_teacher_id=account_teacher_request.id)
-    return LessonDetailResponseCreator.get_from_one(lesson)
+    return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
 
 
-@lessons_router.patch('/{lesson_id}', response_model=LessonDetailResponse)
+@lessons_router.patch('/{lesson_id}', response_model=LessonDetailForEditResponse)
 async def lesson_update(lesson_id: int,
                         lesson_request: LessonUpdateRequest,
                         account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
     lesson = await LessonService.update_lesson(lesson_id, lesson_request, account_teacher.id)
-    return LessonDetailResponseCreator.get_from_one(lesson)
+    return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
