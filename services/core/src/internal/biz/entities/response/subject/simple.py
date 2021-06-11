@@ -4,6 +4,5 @@ from src.internal.biz.entities.response.base import BaseResponseModel
 
 
 class SubjectSimpleResponse(BaseResponseModel):
-    name: str = Field(None, example='Название')
-    course_id: int = Field(..., example=1)
-    subject_id: int = Field(..., example=2)
+    id: int = Field(..., example=1)
+    name: str = Field(..., example='Название')
