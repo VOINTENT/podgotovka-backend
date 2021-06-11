@@ -48,8 +48,14 @@ class Lesson:
         self.account_teacher_id = account_teacher_id
 
     @property
-    def finish_time_in_seconds(self) -> int:
+    def datetime_start_timestamp(self) -> Optional[int]:
+        if not self.datetime_start:
+            return None
+        return int(self.datetime_start.timestamp())
+
+    @property
+    def finish_time_in_seconds(self) -> Optional[int]:
         if not self.time_finish:
-            raise TypeError
+            return None
 
         return self.time_finish.hour * 3600 + self.time_finish.minute * 60

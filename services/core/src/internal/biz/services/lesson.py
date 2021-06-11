@@ -19,12 +19,13 @@ class LessonService:
         return await LessonDao().add(lesson)
 
     @staticmethod
-    def _transfer_none_fields(past_state: Lesson, future_state: Lesson) -> Lesson:
-        for attr, value in vars(future_state).items():
-            if value is None:
-                past_value = getattr(past_state, attr)
-                setattr(future_state, attr, past_value)
-        return future_state
+    async def get_lesson_detail_for_edit(lesson_id: int) -> Lesson:
+        lesson_exist = await LessonDao().exist(lesson_id)
+        if not lesson_exist:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        lesson = await LessonDao().get_with_files(lesson_id)
+        return lesson
 
     @staticmethod
     async def update_lesson(lesson_id: int, lesson_request: LessonUpdateRequest,
@@ -37,7 +38,8 @@ class LessonService:
             raise LessonExceptionEnum.LESSON_FORBIDDEN
 
         new_lesson = LessonCreator.get_from_existed_and_updated(existed_lesson, lesson_request)
-        return await LessonDao().update(lesson_id, new_lesson)
+        await LessonDao().update(lesson_id, new_lesson)
+        return await LessonDao().get_with_files(lesson_id)
 
     @classmethod
     async def get_published_lessons_with_counts(
