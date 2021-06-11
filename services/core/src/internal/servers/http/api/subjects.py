@@ -6,6 +6,7 @@ from src.internal.biz.creators.response.subject_simple import SubjectSimpleRespo
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.biz.subject import Subject
+from src.internal.biz.entities.response.subject.custom import SubjectCustomResponse
 from src.internal.biz.entities.response.subject.simple import SubjectSimpleResponse
 from src.internal.biz.services.subjects import SubjectsService
 from src.internal.servers.http.depends.auth import get_current_account_teacher, get_current_account_student
@@ -22,7 +23,7 @@ async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_
     pass
 
 
-@subjects_router.get('/my/teachers/lead', response_model=List[SubjectSimpleResponse])
+@subjects_router.get('/my/teachers/lead', response_model=List[SubjectCustomResponse])
 async def get_my_teacher_subjects_lead(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
                                        pagination_params: PaginationParams = Depends(),
                                        course_id: int = Depends(get_course_id)):
