@@ -29,12 +29,56 @@ pipelines:
            - echo 'Running tests...'
            - pytest services/core/tests -vs
 
-           - echo 'Sending message to slack...'
-           - git_log='git log -n 1'
-           - author_name=$($git_log --pretty=format:"%an")
-           - title_message=$($git_log --pretty=format:"%s")
-           - text_message=$($git_log --pretty=format:"%b")
-           - pip3 install -r ./helpers/notifier/requirements.txt
-           - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#36a64f"
           services:
             - postgres
+
+      - step:
+          name: Deploying code to development server
+          deployment: Staging
+          script:
+            - ssh $USER@$HOST "rm -rf services && rm -rf configs"
+            - pipe: atlassian/rsync-deploy:0.4.3
+              variables:
+                USER: $USER
+                SERVER: $HOST
+                REMOTE_PATH: '~'
+                LOCAL_PATH: './services ./assets/dev/configs'
+
+            - echo 'Installing requirements...'
+            - ssh $USER@$HOST "~/.python/bin/python3.9 -m venv ~/services/core/venv"
+            - ssh $USER@$HOST "~/services/core/venv/bin/pip install -U pip setuptools"
+            - ssh $USER@$HOST "~/services/core/venv/bin/pip install -r ~/services/core/requirements.txt"
+
+            - echo 'Applying migrations...'
+            - $USER@$HOST "export PODGOTOVKA_DB_HOST=$PODGOTOVKA_DB_HOST &&
+              export PODGOTOVKA_DB_PORT=$PODGOTOVKA_DB_PORT &&
+              export PODGOTOVKA_DB_USER=$PODGOTOVKA_DB_USER &&
+              export PODGOTOVKA_DB_PASSWORD=$PODGOTOVKA_DB_PASSWORD &&
+              cd ~/services/core && venv/bin/alembic upgrade head && cd ../.."
+
+            - echo 'Updating supervisor configs...'
+            - myenv="PODGOTOVKA_API_TITLE=\"$PODGOTOVKA_API_TITLE\",
+              PODGOTOVKA_API_DESCRIPTION=\"PODGOTOVKA_API_DESCRIPTION\",
+              PODGOTOVKA_API_VERSION=\"$PODGOTOVKA_API_VERSION\",
+              PODGOTOVKA_DEBUG=\"$PODGOTOVKA_DEBUG\",
+              PODGOTOVKA_DB_HOST=\"$PODGOTOVKA_DB_HOST\",
+              PODGOTOVKA_DB_PORT=\"$PODGOTOVKA_DB_PORT\",
+              PODGOTOVKA_DB_USER=\"$PODGOTOVKA_DB_USER\",
+              PODGOTOVKA_DB_PASSWORD=\"$PODGOTOVKA_DB_PASSWORD\",
+              PODGOTOVKA_PRIMARY_DB_NAME=\"$PODGOTOVKA_PRIMARY_DB_NAME\",
+              PODGOTOVKA_LOGS_DB_NAME=\"$PODGOTOVKA_LOGS_DB_NAME\",
+              PODGOTOVKA_FILES_LINK=\"$PODGOTOVKA_FILES_LINK\",
+              PODGOTOVKA_SECRET_KEY=\"$PODGOTOVKA_SECRET_KEY\",
+              PODGOTOVKA_ENCRYPT_ALGORITHM=\"$PODGOTOVKA_ENCRYPT_ALGORITHM\",
+              PODGOTOVKA_FILES_LINK=\"$PODGOTOVKA_FILES_LINK\""
+
+            - ssh $USER@$HOST "echo 'environment=$myenv' >> ~/configs/supervisor/core.conf"
+            - ssh $USER_ROOT@$HOST "service supervisor restart"
+
+            - echo 'Sending message to slack...'
+            - git_log='git log -n 1'
+            - author_name=$($git_log --pretty=format:"%an")
+            - title_message=$($git_log --pretty=format:"%s")
+            - text_message=$($git_log --pretty=format:"%b")
+            - pip3 install -r ./helpers/notifier/requirements.txt
+            - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#36a64f"
