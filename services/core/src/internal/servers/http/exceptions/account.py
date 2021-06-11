@@ -8,3 +8,4 @@ class AccountsExceptionEnum:
                                      headers={'WWW-Authenticate': 'Bearer'})
     INVALID_VK_STATUS = HTTPException(401, "Нельзя использовать аккаунт ВК который удален, либо заблокирован")
     INVALID_VK_CODE = HTTPException(401, "Ошибка авторизации через ВК")
+    ACCOUNT_ALREADY_EXISTED = HTTPException(400, "Пользователь с таким Email уже существует")
