@@ -70,6 +70,7 @@ pipelines:
               PODGOTOVKA_FILES_LINK=\"$PODGOTOVKA_FILES_LINK\",
               PODGOTOVKA_SECRET_KEY=\"$PODGOTOVKA_SECRET_KEY\",
               PODGOTOVKA_ENCRYPT_ALGORITHM=\"$PODGOTOVKA_ENCRYPT_ALGORITHM\",
+              PODGOTOVKA_CURRENT_URL=\"$PODGOTOVKA_CURRENT_URL\",
               PODGOTOVKA_FILES_LINK=\"$PODGOTOVKA_FILES_LINK\""
 
             - ssh $USER@$HOST "echo 'environment=$myenv' >> ~/configs/supervisor/core.conf"
