@@ -94,6 +94,17 @@ subject_course_table = Table(
     UniqueConstraint('subject_id', 'course_id')
 )
 
+subject_course_lead_table = Table(
+    'subject_course_lead',
+    metadata,
+    Column('id', Integer, default=Sequence('subject_course_id_seq'), primary_key=True),
+    Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
+    Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
+    Column('account_teacher_id', ForeignKey('account_teacher.id', ondelete='CASCADE'), nullable=False),
+    Column('subject_course_id', ForeignKey('subject_course.id', ondelete='CASCADE'), nullable=False),
+    UniqueConstraint('account_teacher_id', 'subject_course_id')
+)
+
 lesson_table = Table(
     'lesson',
     metadata,
@@ -214,7 +225,6 @@ subject_course_subscription_table = Table(
     Column('created_at', DateTime, nullable=False, server_default=func.current_timestamp()),
     Column('edited_at', DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=datetime.now),
     Column('account_student_id', ForeignKey('account_student.id', ondelete='CASCADE'), nullable=False),
-    Column('subject_id', ForeignKey('subject.id', ondelete='CASCADE'), nullable=False),
-    Column('course_id', ForeignKey('course.id', ondelete='CASCADE'), nullable=False),
-    UniqueConstraint('account_student_id', 'subject_id', 'course_id')
+    Column('subject_course_id', ForeignKey('subject_course.id', ondelete='CASCADE'), nullable=False),
+    UniqueConstraint('account_student_id', 'subject_course_id')
 )
