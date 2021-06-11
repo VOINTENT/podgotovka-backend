@@ -14,6 +14,10 @@ class AccountsStudentService:
         return await AccountStudentDao().get_by_id(account_student_id)
 
     @staticmethod
+    async def get_by_id_detail(account_student_id: int) -> AccountStudent:
+        return await AccountStudentDao().get_detail_by_id(account_student_id)
+
+    @staticmethod
     async def register_account(account_student: AccountStudent) -> Token:
         existed_account = await AccountStudentDao().get_by_email(account_student.email)
         if existed_account:

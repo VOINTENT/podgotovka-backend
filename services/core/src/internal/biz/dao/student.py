@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List, Any
 
 from sqlalchemy import func, select
 
@@ -9,6 +9,14 @@ from src.schema.meta import account_student_table
 
 
 class AccountStudentDao(BaseDao):
+    async def get_detail_by_id(self, account_student_id: int) -> Optional[AccountStudent]:
+        query = select(self.__class__._get_select_detail()). \
+            where(account_student_table.c.id == account_student_id)
+        row = await self.fetchone(query)
+        if not row:
+            return None
+        return AccountStudentCreator().get_from_record(row)
+
     async def get_by_id(self, account_student_id: int) -> Optional[AccountStudent]:
         query = select([
             account_student_table.c.id.label('account_student_id'),
@@ -68,3 +76,17 @@ class AccountStudentDao(BaseDao):
         if not row:
             return None
         return AccountStudentCreator().get_from_record(row)
+
+    @staticmethod
+    def _get_select_detail() -> List[Any]:
+        return [
+            account_student_table.c.id.label('account_student_id'),
+            account_student_table.c.email.label('account_email'),
+            account_student_table.c.name.label('account_name'),
+            account_student_table.c.last_name.label('account_last_name'),
+            account_student_table.c.middle_name.label('account_middle_name'),
+            account_student_table.c.description.label('account_description'),
+            account_student_table.c.photo_link.label('account_photo_link'),
+            account_student_table.c.hash_password.label('account_hash_password'),
+            account_student_table.c.vk_id.label('account_student_vk_id'),
+        ]
