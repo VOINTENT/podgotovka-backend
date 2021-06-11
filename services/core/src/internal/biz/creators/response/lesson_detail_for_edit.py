@@ -19,5 +19,6 @@ class LessonDetailForEditResponseCreator(Creator):
             time_start=lesson.datetime_start_timestamp,
             time_finish=lesson.finish_time_in_seconds,
             files=DocumentSimpleResponseCreator.get_many_from_documents(lesson.documents) if lesson.documents else [],
-            lecture=lesson.lecture
+            lecture=lesson.lecture,
+            status=lesson.status
         )

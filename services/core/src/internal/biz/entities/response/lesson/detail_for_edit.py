@@ -20,4 +20,4 @@ class LessonDetailForEditResponse(BaseResponseModel):
     time_finish: Optional[int] = Field(None, example=460)
     files: List[DocumentSimpleResponse]
     lecture: Optional[str] = Field(None, example='Лекция')
-    status: LessonStatusEnum = LessonStatusEnum.published
+    status: LessonStatusEnum = Field(..., example='draft')
