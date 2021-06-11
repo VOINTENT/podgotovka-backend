@@ -23,9 +23,9 @@ async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_
 
 
 @subjects_router.get('/my/teachers/lead', response_model=List[SubjectSimpleResponse])
-async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
-                                  pagination_params: PaginationParams = Depends(),
-                                  course_id: int = Depends(get_course_id)):
+async def get_my_teacher_subjects_lead(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
+                                       pagination_params: PaginationParams = Depends(),
+                                       course_id: int = Depends(get_course_id)):
     pass
 
 
@@ -37,11 +37,10 @@ async def get_my_student_subjects(account_student: AccountStudent = Depends(get_
 
 
 @subjects_router.get('/my/students/subscribed', response_model=List[SubjectSimpleResponse])
-async def get_my_student_subjects(account_student: AccountStudent = Depends(get_current_account_student),
-                                  pagination_params: PaginationParams = Depends(),
-                                  course_id: int = Depends(get_course_id)):
+async def get_my_student_subjects_subscribed(account_student: AccountStudent = Depends(get_current_account_student),
+                                             pagination_params: PaginationParams = Depends(),
+                                             course_id: int = Depends(get_course_id)):
     pass
-
 
 
 @subjects_router.get('/', response_model=List[SubjectSimpleResponse])
