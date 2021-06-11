@@ -110,7 +110,7 @@ class TestLessonData:
     time_start = datetime.datetime(year=2021, month=1, day=1, hour=10, minute=0)
     time_finish = datetime.time(hour=11, minute=0)
     text = get_random_json()
-    is_published = True
+    status = 'published'
     subject = TestSubjectData
     course = TestCourseData
     homework_id = TestHomeworkData.id
@@ -126,7 +126,7 @@ class TestLessonData2:
     time_start = datetime.datetime(year=2021, month=2, day=1, hour=10, minute=0)
     time_finish = datetime.time(hour=13, minute=0)
     text = get_random_json()
-    is_published = True
+    status = 'published'
     subject = TestSubjectData2
     course = TestCourseData2
     homework_id = None

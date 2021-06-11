@@ -8,7 +8,7 @@ from tests.utils.asserts.db.lesson import assert_lesson_in_db
 from tests.utils.asserts.models.lesson import assert_lesson_simple_list_with_counts_response, \
     assert_lesson_detail_for_student_response, assert_lesson_detail_for_edit_response
 from tests.utils.db import run_query
-from tests.utils.utils import get_auth_headers, get_random_json
+from tests.utils.utils import get_auth_headers, get_random_json, get_random_str
 
 
 def test_add_empty_lesson(client: TestClient, truncate, teacher_account, teacher_account_access_token):
@@ -114,26 +114,39 @@ def test_update_lesson_set_empty(client: TestClient, truncate, teacher_account_a
 
 def test_update_lesson(client: TestClient, truncate, teacher_account_access_token, courses,
                        subjects, lesson2):
-    current_datetime = datetime.datetime.now()
-    current_time = current_datetime.time()
+    new_datetime = datetime.datetime.now()
+    new_time = new_datetime.time()
     new_lecture = get_random_json()
+    new_name = get_random_str()
+    new_description = get_random_str()
+    new_youtube_link = get_random_str()
     response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={
         'subject_id': TestSubjectData.id,
         'course_id': TestCourseData.id,
-        'name': 'qwsdasd',
-        'description': 'fsdfwef',
-        'youtube_link': 'ghhfbcv',
-        'time_start': int(current_datetime.timestamp()),
-        'time_finish': current_time.hour * 3600 + current_time.minute * 60,
+        'name': new_name,
+        'description': new_description,
+        'youtube_link': new_youtube_link,
+        'time_start': int(new_datetime.timestamp()),
+        'time_finish': new_time.hour * 3600 + new_time.minute * 60,
         'files': [],
         'lecture': new_lecture
     }, headers=get_auth_headers(teacher_account_access_token))
     assert response.status_code == 200
 
+    response_json = response.json()
+    assert_lesson_detail_for_edit_response(
+        response_json, id=TestLessonData2.id, subject={
+            'id': TestSubjectData.id, 'name': TestSubjectData.name
+        }, course={'id': TestCourseData.id, 'name': TestCourseData.name}, name=new_name,
+        description=new_description, youtube_link=new_youtube_link,
+        time_start=new_datetime, time_finish=new_time, files=[],
+        lecture=new_lecture, status=TestLessonData2.status
+    )
+
     assert_lesson_in_db(
-        subject_id=TestSubjectData.id, course_id=TestCourseData.id, name='qwsdasd', description='fsdfwef',
-        youtube_link='ghhfbcv', time_start=current_datetime,
-        time_finish=current_time, files=[], lecture=new_lecture)
+        subject_id=TestSubjectData.id, course_id=TestCourseData.id, name=new_name, description=new_description,
+        youtube_link=new_youtube_link, time_start=new_datetime,
+        time_finish=new_time, files=[], lecture=new_lecture)
 
 
 def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_access_token, courses,
@@ -141,6 +154,16 @@ def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_
     response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={},
                             headers=get_auth_headers(teacher_account_access_token))
     assert response.status_code == 200
+
+    response_json = response.json()
+    assert_lesson_detail_for_edit_response(
+        response_json, id=TestLessonData2.id, subject={
+            'id': TestLessonData2.subject.id, 'name': TestLessonData2.subject.name
+        }, course={'id': TestLessonData2.course.id, 'name': TestLessonData2.course.name}, name=TestLessonData2.name,
+        description=TestLessonData2.description, youtube_link=TestLessonData2.youtube_link,
+        time_start=TestLessonData2.time_start, time_finish=TestLessonData2.time_finish, files=[],
+        lecture=TestLessonData2.text, status=TestLessonData2.status
+    )
 
     assert_lesson_in_db(
         subject_id=TestLessonData2.subject.id, course_id=TestLessonData2.course.id, name=TestLessonData2.name,
@@ -173,5 +196,5 @@ def test_get_lesson_detail_for_edit(client: TestClient, truncate, teacher_accoun
         }, course={'id': TestLessonData2.course.id, 'name': TestLessonData2.course.name}, name=TestLessonData2.name,
         description=TestLessonData2.description, youtube_link=TestLessonData2.youtube_link,
         time_start=TestLessonData2.time_start, time_finish=TestLessonData2.time_finish, files=[],
-        lecture=TestLessonData2.text, status='published'
+        lecture=TestLessonData2.text, status=TestLessonData2.status
     )

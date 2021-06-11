@@ -11,6 +11,7 @@ from src.internal.biz.creators.biz.subject import SubjectCreator
 from src.internal.biz.entities.biz.course import Course
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.biz.subject import Subject
+from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 
 
@@ -27,7 +28,7 @@ class LessonCreator(CreatorBiz):
             datetime_start=record.get('lesson_datetime_start'),
             time_finish=record.get('lesson_time_finish'),
             description=record.get('lesson_description'),
-            is_published=record.get('lesson_is_published'),
+            status=record.get('lesson_status'),
             account_teacher_id=record.get('account_teacher_id'),
             lecture=record.get('lesson_lecture'),
             course=course,
@@ -72,7 +73,7 @@ class LessonCreator(CreatorBiz):
 
     @classmethod
     def get_empty(cls, account_teacher_id: int) -> Lesson:
-        return Lesson(account_teacher_id=account_teacher_id)
+        return Lesson(account_teacher_id=account_teacher_id, status=LessonStatusEnum.draft)
 
     @staticmethod
     def _to_datetime_from_sec(sec: Optional[int]) -> Optional[datetime.datetime]:
