@@ -6,7 +6,7 @@ from tests.test_data import TestLessonData, TestLessonData2, TestLessonFileData,
     TestAccountTeacherData, TestSubjectData, TestCourseData
 from tests.utils.asserts.db.lesson import assert_lesson_in_db
 from tests.utils.asserts.models.lesson import assert_lesson_simple_list_with_counts_response, \
-    assert_lesson_detail_for_student_response
+    assert_lesson_detail_for_student_response, assert_lesson_detail_for_edit_response
 from tests.utils.db import run_query
 from tests.utils.utils import get_auth_headers, get_random_json
 
@@ -157,4 +157,21 @@ def test_get_my_teacher_lessons(client: TestClient, truncate, access_token_teach
     response_json = response.json()
     assert_lesson_simple_list_with_counts_response(
         response_json, count_last=0, count_next=0, lessons=[TestLessonData, TestLessonData2]
+    )
+
+
+def test_get_lesson_detail_for_edit(client: TestClient, truncate, teacher_account_access_token, courses, subjects,
+                                    lesson2):
+    response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/teachers/for-edit',
+                          headers=get_auth_headers(teacher_account_access_token))
+    assert response.status_code == 200
+
+    response_json = response.json()
+    assert_lesson_detail_for_edit_response(
+        response_json, id=TestLessonData2.id, subject={
+            'id': TestLessonData2.subject.id, 'name': TestLessonData2.subject.name
+        }, course={'id': TestLessonData2.course.id, 'name': TestLessonData2.course.name}, name=TestLessonData2.name,
+        description=TestLessonData2.description, youtube_link=TestLessonData2.youtube_link,
+        time_start=TestLessonData2.time_start, time_finish=TestLessonData2.time_finish, files=[],
+        lecture=TestLessonData2.text, status='published'
     )

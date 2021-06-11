@@ -24,19 +24,16 @@ class LessonDao(BaseDao):
         await self.execute(query)
 
     async def exist(self, lesson_id: int) -> Optional[int]:
-        query = select([lesson_table.c.id.label('lesson_id')]). \
-            where(lesson_table.c.id == lesson_id)
+        query = select([True]).select_from(lesson_table).where(lesson_table.c.id == lesson_id)
 
-        row = await self.fetchone(query)
-        if not row:
-            return None
-        return row['lesson_id']
+        exist = await self.fetchval(query)
+        return bool(exist)
 
     async def get(self, lesson_id: int) -> Optional[Lesson]:
         query = select(
             self.__class__._get_simple_select_columns()
         ).select_from(
-            self.__class__._get_joined_for_select()
+            lesson_table.outerjoin(subject_table).outerjoin(course_table).outerjoin(lesson_file_table)
         ).where(and_(
             lesson_table.c.id == lesson_id
         ))
@@ -45,6 +42,12 @@ class LessonDao(BaseDao):
         if not row:
             return None
         return LessonCreator().get_from_record(row)
+
+    async def get_with_files(self, lesson_id: int) -> Optional[Lesson]:
+        lesson = await self.get(lesson_id)
+        documents: List[Document] = await self.get_documents_by_lesson_id(lesson_id)
+        lesson.documents = documents
+        return lesson
 
     async def add(self, lesson: Lesson) -> Lesson:
         query = lesson_table.insert().values(
@@ -241,7 +244,6 @@ class LessonDao(BaseDao):
             lesson_table.c.is_published.label('lesson_is_published'),
             lesson_table.c.subject_id.label('subject_id'),
             lesson_table.c.course_id.label('course_id'),
-            lesson_table.c.homework_id.label('lesson_id'),
             lesson_table.c.account_teacher_id.label('account_teacher_id'),
 
             subject_table.c.name.label('subject_name'),
