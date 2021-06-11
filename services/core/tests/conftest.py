@@ -10,7 +10,7 @@ from tests.test_data import TestAccountTeacherData, TestSubjectData, TestSubject
     TestLessonFileData2, TestAnswerVariantData, TestAnswerVariantData2, TestAnswerVariantData3, TestAnswerVariantData4, \
     TestAccountStudentData, TestAccountStudentVkData, TestSubjectCourseData2, TestSubjectCourseData3
 from tests.utils.db import truncate_tables, create_account_teacher, create_subject, create_course, \
-    create_subject_course, create_structure, create_lesson, create_homework, create_homework_test, create_test_question, \
+    create_subject_course, create_lesson, create_homework, create_homework_test, create_test_question, \
     create_lesson_file, create_answer_variant, create_account_student, create_account_student_vk, \
     create_subject_course_lead, create_subject_course_subscribed, create_subject_course_with_id
 
@@ -130,13 +130,6 @@ def subject_course_lead():
                                subject_course_id=TestSubjectCourseData2.id)
     create_subject_course_lead(account_teacher_id=TestAccountTeacherData.id,
                                subject_course_id=TestSubjectCourseData3.id)
-
-
-@pytest.fixture()
-def structures():
-    create_structure(id=TestStructureData.id, name=TestStructureData.name)
-    create_structure(id=TestStructureData2.id, name=TestStructureData2.name)
-    create_structure(id=TestStructureData3.id, name=TestStructureData3.name)
 
 
 @pytest.fixture()

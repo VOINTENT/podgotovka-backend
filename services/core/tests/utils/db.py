@@ -100,12 +100,6 @@ def create_subject_course_subscribed(account_student_id: int, subject_course_id:
         """, account_student_id, subject_course_id)
 
 
-def create_structure(id: int, name: str) -> None:
-    run_query("""
-        INSERT INTO structure(id, name) VALUES ($1, $2);
-    """, id, name)
-
-
 def create_lesson(
         id: int, name: str, description: str, youtube_link: str, time_start: datetime.datetime,
         time_finish: datetime.time, text: str, is_published: bool, subject_id, course_id: int, homework_id: int,
