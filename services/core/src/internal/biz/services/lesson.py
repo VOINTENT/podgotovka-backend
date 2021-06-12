@@ -5,6 +5,7 @@ from src.internal.biz.creators.biz.lesson import LessonCreator
 from src.internal.biz.creators.biz.lesson_with_counts import LessonWithCountsCreator
 from src.internal.biz.dao.lesson import LessonDao
 from src.internal.biz.entities.biz.lesson import Lesson
+from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 from src.internal.biz.entities.enum.order import OrderEnum
@@ -92,3 +93,19 @@ class LessonService:
         count_next = await LessonDao().get_count_next(max_created_at, course_id=course_id, subject_id=subject_id,
                                                       account_teacher_id=account_teacher_id)
         return count_last, count_next
+
+    @staticmethod
+    async def update_lesson_status(lesson_id: int, lesson_status: LessonStatusEnum,
+                                   auth_account_teacher_id: int) -> None:
+        owner_account_teacher_id = await LessonDao().get_owner_account_teacher_id(lesson_id)
+        if not owner_account_teacher_id:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        if owner_account_teacher_id != auth_account_teacher_id:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        if lesson_status == LessonStatusEnum.published:
+            lesson: Lesson = await LessonDao().get_with_files(lesson_id)
+            lesson.validate()
+
+        await LessonDao().update_status(lesson_id, lesson_status)

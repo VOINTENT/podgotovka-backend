@@ -218,6 +218,17 @@ class LessonDao(BaseDao):
         rows = await self.fetchall(query)
         return DocumentCreator.get_many_from_record(rows)
 
+    async def get_owner_account_teacher_id(self, lesson_id) -> Optional[int]:
+        query = select([lesson_table.c.account_teacher_id]).select_from(
+            lesson_table).where(lesson_table.c.id == lesson_id)
+
+        account_teacher_id = await self.fetchval(query)
+        return account_teacher_id
+
+    async def update_status(self, lesson_id: int, status: LessonStatusEnum) -> None:
+        query = lesson_table.update().values(status=status).where(lesson_table.c.id == lesson_id)
+        await self.execute(query)
+
     @staticmethod
     def _get_select_count_questions(homework_id: int) -> Select:
         return select([
