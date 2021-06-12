@@ -12,6 +12,7 @@ from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
+from src.internal.biz.entities.request.lesson.status import LessonStatusUpdateRequest
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.biz.entities.response.common.just_id import JustIdResponse
 from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
@@ -122,3 +123,11 @@ async def lesson_update(lesson_id: int,
                         account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
     lesson = await LessonService.update_lesson(lesson_id, lesson_request, account_teacher.id)
     return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
+
+
+@lessons_router.patch('/{lesson_id}/status', response_model=bool)
+async def update_status(lesson_id: int,
+                        status_request: LessonStatusUpdateRequest,
+                        account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
+    await LessonService.update_lesson_status(lesson_id, status_request.status, account_teacher.id)
+    return True
