@@ -11,8 +11,8 @@ class LessonDetailForEditResponseCreator(Creator):
     def get_from_lesson(lesson: Lesson) -> LessonDetailForEditResponse:
         return LessonDetailForEditResponse(
             id=lesson.id,
-            subject=SubjectSimpleResponseCreator.get_from_subject(lesson.subject),
-            course=CourseSimpleResponseCreator.get_from_course(lesson.course),
+            subject=SubjectSimpleResponseCreator.get_from_subject(lesson.subject) if lesson.subject else None,
+            course=CourseSimpleResponseCreator.get_from_course(lesson.course) if lesson.course else None,
             name=lesson.name,
             description=lesson.description,
             youtube_link=lesson.youtube_link,

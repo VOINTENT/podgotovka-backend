@@ -198,3 +198,13 @@ def test_get_lesson_detail_for_edit(client: TestClient, truncate, access_token_t
         time_start=TestLessonData2.time_start, time_finish=TestLessonData2.time_finish, files=[],
         lecture=TestLessonData2.text, status=TestLessonData2.status
     )
+
+
+def test_update_status(client: TestClient, truncate, access_token_teacher, courses, subjects, lesson2):
+    response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}/status', json={'status': 'published'},
+                            headers=get_auth_headers(access_token_teacher))
+    assert response.status_code == 200
+    assert response.json() is True
+
+    status = run_query("""SELECT status FROM lesson WHERE id = $1""", TestLessonData2.id)[0][0]
+    assert status == 'published'

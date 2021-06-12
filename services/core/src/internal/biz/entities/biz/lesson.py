@@ -7,6 +7,7 @@ from src.internal.biz.entities.biz.homework.homework import Homework
 from src.internal.biz.entities.biz.homework.info import HomeworkInfo
 from src.internal.biz.entities.biz.subject import Subject
 from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
+from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 
 
 class Lesson:
@@ -59,3 +60,19 @@ class Lesson:
             return None
 
         return self.time_finish.hour * 3600 + self.time_finish.minute * 60
+
+    def validate(self) -> None:
+        if not self.subject:
+            raise LessonExceptionEnum.LESSON_NOT_SUBJECT
+
+        if not self.course:
+            raise LessonExceptionEnum.LESSON_NOT_COURSE
+
+        if not self.name:
+            raise LessonExceptionEnum.LESSON_NOT_NAME
+
+        if not self.youtube_link:
+            raise LessonExceptionEnum.LESSON_NOT_YOUTUBE_LINK
+
+        if not self.datetime_start:
+            raise LessonExceptionEnum.LESSON_NOT_DATETIME_START
