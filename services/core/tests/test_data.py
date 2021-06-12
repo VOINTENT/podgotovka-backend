@@ -8,6 +8,9 @@ class TestAccountTeacherData:
     edited_at = get_random_datetime()
     email = get_random_email()
     name = get_random_str()
+    last_name = get_random_str()
+    middle_name = get_random_str()
+    description = get_random_str()
     password = 'qwerty123'
     hash_password = '$2y$12$MkyswyVUDAGfphgolW2i8uxTeenqCfAqQajMM//S7VMAKujXp6GtG'
 
@@ -17,6 +20,9 @@ class TestAccountStudentData:
     edited_at = get_random_datetime()
     email = get_random_email()
     name = get_random_str()
+    last_name = get_random_str()
+    middle_name = get_random_str()
+    description = get_random_str()
     password = 'qwerty123'
     hash_password = '$2y$12$MkyswyVUDAGfphgolW2i8uxTeenqCfAqQajMM//S7VMAKujXp6GtG'
 
@@ -71,6 +77,20 @@ class TestCourseData2:
 class TestSubjectCourseData:
     subject_id = TestSubjectData.id
     course_id = TestCourseData.id
+
+
+class TestSubjectCourseData2:
+    id = get_random_int()
+    subject_id = TestSubjectData.id
+    course_id = TestCourseData.id
+    name = f"{TestSubjectData.name} ({TestCourseData.name})"
+
+
+class TestSubjectCourseData3:
+    id = get_random_int()
+    subject_id = TestSubjectData2.id
+    course_id = TestCourseData.id
+    name = f"{TestSubjectData2.name} ({TestCourseData.name})"
 
 
 class TestHomeworkTestData:

@@ -11,7 +11,7 @@ from src.internal.biz.entities.enum.homework_type import HomeworkTypeEnum
 from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.schema.meta import lesson_table, course_table, subject_table, lesson_view_table, lesson_file_table, \
-    subject_course_subscription_table, homework_table, homework_test_table, test_question_table
+    subject_course_subscription_table, homework_table, homework_test_table, test_question_table, subject_course_table
 from src.internal.biz.dao.base import BaseDao
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.creators.biz.lesson import LessonCreator
@@ -187,18 +187,9 @@ class LessonDao(BaseDao):
                  self.__class__._get_select_count_questions(homework_table.c.id).as_scalar())
             ], else_=text('0')).label('homework_count_questions'),
             select([0]).as_scalar().label('homework_count_right_answers'),
-        ]).select_from(
-            lesson_table.join(
-                subject_course_subscription_table, onclause=and_(
-                    lesson_table.c.course_id == subject_course_subscription_table.c.course_id,
-                    lesson_table.c.subject_id == subject_course_subscription_table.c.subject_id,
-                    subject_course_subscription_table.c.account_student_id == account_student_id), isouter=True
-            ).join(
-                homework_table, isouter=True
-            )
-        ).where(
-            lesson_table.c.id == lesson_id
-        )
+        ]). \
+            select_from(self.__class__._add_select_from_joined(account_student_id)). \
+            where(lesson_table.c.id == lesson_id)
 
         row = await self.fetchone(query)
         if not row:
@@ -228,6 +219,17 @@ class LessonDao(BaseDao):
     async def update_status(self, lesson_id: int, status: LessonStatusEnum) -> None:
         query = lesson_table.update().values(status=status).where(lesson_table.c.id == lesson_id)
         await self.execute(query)
+
+    @staticmethod
+    def _add_select_from_joined(account_student_id: int) -> Select:
+        return lesson_table. \
+            outerjoin(subject_course_subscription_table,
+                      subject_course_subscription_table.c.account_student_id == account_student_id). \
+            outerjoin(subject_course_table,
+                      and_(subject_course_table.c.id == subject_course_subscription_table.c.subject_course_id,
+                           subject_course_table.c.subject_id == lesson_table.c.subject_id,
+                           subject_course_table.c.course_id == lesson_table.c.course_id)). \
+            outerjoin(homework_table)
 
     @staticmethod
     def _get_select_count_questions(homework_id: int) -> Select:

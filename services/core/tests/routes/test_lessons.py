@@ -11,18 +11,18 @@ from tests.utils.db import run_query
 from tests.utils.utils import get_auth_headers, get_random_json, get_random_str
 
 
-def test_add_empty_lesson(client: TestClient, truncate, teacher_account, teacher_account_access_token):
+def test_add_empty_lesson(client: TestClient, truncate, account_teacher, access_token_teacher):
     response = client.post('/core/v1/lessons/', json={},
-                           headers=get_auth_headers(teacher_account_access_token))
+                           headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
     lessons = run_query("SELECT id, account_teacher_id FROM lesson WHERE account_teacher_id=$1",
                         TestAccountTeacherData.id)
     assert lessons[0][1] == TestAccountTeacherData.id
 
 
-def test_get_published_lessons(client: TestClient, truncate, teacher_account, courses, subjects, homework, lesson,
-                               lesson2):
-    response = client.get('/core/v1/lessons')
+def test_get_lessons(client: TestClient, truncate, account_teacher, courses, subjects, homework, lesson,
+                     lesson2):
+    response = client.get('/core/v1/lessons/')
     assert response.status_code == 200, response.text
 
     result = response.json()
@@ -32,7 +32,7 @@ def test_get_published_lessons(client: TestClient, truncate, teacher_account, co
     )
 
 
-def test_get_lessons_filters(client: TestClient, truncate, teacher_account, courses, subjects, homework,
+def test_get_lessons_filters(client: TestClient, truncate, account_teacher, courses, subjects, homework,
                              lesson, lesson2):
     date_start = round(TestLessonData2.time_start.timestamp())
     response = client.get(f'/core/v1/lessons?date_start={date_start}')
@@ -51,7 +51,7 @@ def test_get_lessons_filters(client: TestClient, truncate, teacher_account, cour
     assert response.json()['lessons'][0]['id'] == TestLessonData2.id
 
 
-def test_get_lessons_order(client: TestClient, truncate, teacher_account, courses, subjects, homework,
+def test_get_lessons_order(client: TestClient, truncate, account_teacher, courses, subjects, homework,
                            lesson, lesson2):
     response = client.get(f'/core/v1/lessons?order=desc')
     assert response.status_code == 200
@@ -60,7 +60,7 @@ def test_get_lessons_order(client: TestClient, truncate, teacher_account, course
     assert response.json()['lessons'][1]['id'] == TestLessonData2.id
 
 
-def test_get_lessons_pagination(client: TestClient, truncate, teacher_account, courses, subjects, homework,
+def test_get_lessons_pagination(client: TestClient, truncate, account_teacher, courses, subjects, homework,
                                 lesson, lesson2):
     response = client.get(f'/core/v1/lessons?limit=1&skip=1')
     assert response.status_code == 200
@@ -71,7 +71,7 @@ def test_get_lessons_pagination(client: TestClient, truncate, teacher_account, c
     assert response_json['count_next'] == 0
 
 
-def test_get_lesson_detail(client: TestClient, truncate, teacher_account_access_token: str, courses,
+def test_get_lesson_detail(client: TestClient, truncate, access_token_teacher, courses,
                            subjects, homework, lesson):
     response = client.get(f'/core/v1/lessons/{TestLessonData.id}/students')
     assert response.status_code == 200
@@ -85,14 +85,14 @@ def test_get_lesson_detail(client: TestClient, truncate, teacher_account_access_
         homework_type=TestHomeworkData.homework_type, homework_count_questions=2, homework_count_right_answers=0)
 
 
-def test_get_lesson_detail_without_homework(client: TestClient, truncate, teacher_account_access_token: str,
+def test_get_lesson_detail_without_homework(client: TestClient, truncate, access_token_teacher,
                                             courses, subjects, lesson2):
     response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/students')
     assert response.status_code == 200
     assert response.json()['homework'] is None
 
 
-def test_update_lesson_set_empty(client: TestClient, truncate, teacher_account_access_token, courses,
+def test_update_lesson_set_empty(client: TestClient, truncate, access_token_teacher, courses,
                                  subjects, lesson2):
     response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={
         'subject_id': -1,
@@ -104,7 +104,7 @@ def test_update_lesson_set_empty(client: TestClient, truncate, teacher_account_a
         'time_finish': -1,
         'files': [],
         'lecture': ''
-    }, headers=get_auth_headers(teacher_account_access_token))
+    }, headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     assert_lesson_in_db(
@@ -112,7 +112,7 @@ def test_update_lesson_set_empty(client: TestClient, truncate, teacher_account_a
         time_finish=None, files=[], lecture=None)
 
 
-def test_update_lesson(client: TestClient, truncate, teacher_account_access_token, courses,
+def test_update_lesson(client: TestClient, truncate, access_token_teacher, courses,
                        subjects, lesson2):
     new_datetime = datetime.datetime.now()
     new_time = new_datetime.time()
@@ -130,7 +130,7 @@ def test_update_lesson(client: TestClient, truncate, teacher_account_access_toke
         'time_finish': new_time.hour * 3600 + new_time.minute * 60,
         'files': [],
         'lecture': new_lecture
-    }, headers=get_auth_headers(teacher_account_access_token))
+    }, headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     response_json = response.json()
@@ -149,10 +149,10 @@ def test_update_lesson(client: TestClient, truncate, teacher_account_access_toke
         time_finish=new_time, files=[], lecture=new_lecture)
 
 
-def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_access_token, courses,
+def test_update_lesson_do_nothing(client: TestClient, truncate, access_token_teacher, courses,
                                   subjects, lesson2):
     response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}', json={},
-                            headers=get_auth_headers(teacher_account_access_token))
+                            headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     response_json = response.json()
@@ -172,9 +172,9 @@ def test_update_lesson_do_nothing(client: TestClient, truncate, teacher_account_
         time_finish=TestLessonData2.time_finish, files=[], lecture=TestLessonData2.text)
 
 
-def test_get_my_teacher_lessons(client: TestClient, truncate, teacher_account_access_token, courses,
+def test_get_my_teacher_lessons(client: TestClient, truncate, access_token_teacher, courses,
                                 subjects, homework, lesson, lesson2):
-    response = client.get(f'/core/v1/lessons/my/teachers', headers=get_auth_headers(teacher_account_access_token))
+    response = client.get(f'/core/v1/lessons/my/teachers', headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     response_json = response.json()
@@ -183,10 +183,10 @@ def test_get_my_teacher_lessons(client: TestClient, truncate, teacher_account_ac
     )
 
 
-def test_get_lesson_detail_for_edit(client: TestClient, truncate, teacher_account_access_token, courses, subjects,
+def test_get_lesson_detail_for_edit(client: TestClient, truncate, access_token_teacher, courses, subjects,
                                     lesson2):
     response = client.get(f'/core/v1/lessons/{TestLessonData2.id}/teachers/for-edit',
-                          headers=get_auth_headers(teacher_account_access_token))
+                          headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
 
     response_json = response.json()
@@ -200,9 +200,9 @@ def test_get_lesson_detail_for_edit(client: TestClient, truncate, teacher_accoun
     )
 
 
-def test_update_status(client: TestClient, truncate, teacher_account_access_token, courses, subjects, lesson2):
+def test_update_status(client: TestClient, truncate, access_token_teacher, courses, subjects, lesson2):
     response = client.patch(f'/core/v1/lessons/{TestLessonData2.id}/status', json={'status': 'published'},
-                            headers=get_auth_headers(teacher_account_access_token))
+                            headers=get_auth_headers(access_token_teacher))
     assert response.status_code == 200
     assert response.json() is True
 

@@ -41,20 +41,25 @@ def truncate_tables():
             prompt, 
             answer_variant, 
             lesson_view, 
-            subject_course_subscription
+            subject_course_subscription,
+            subject_course_lead
     """)
 
 
-def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+def create_account_teacher(id: int, edited_at, email: str, name: str, hash_password: str,
+                           last_name: str, middle_name: str, description: str) -> None:
     run_query("""
-        INSERT INTO account_teacher(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
-    """, id, edited_at, email, name, hash_password)
+        INSERT INTO account_teacher(id, edited_at, email, name, hash_password, last_name, middle_name, description) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    """, id, edited_at, email, name, hash_password, last_name, middle_name, description)
 
 
-def create_account_student(id: int, edited_at, email: str, name: str, hash_password: str) -> None:
+def create_account_student(id: int, edited_at, email: str, name: str, hash_password: str,
+                           last_name: str, middle_name: str, description: str) -> None:
     run_query("""
-        INSERT INTO account_student(id, edited_at, email, name, hash_password) VALUES ($1, $2, $3, $4, $5)
-    """, id, edited_at, email, name, hash_password)
+        INSERT INTO account_student(id, edited_at, email, name, hash_password, last_name, middle_name, description) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    """, id, edited_at, email, name, hash_password, last_name, middle_name, description)
 
 
 def create_account_student_vk(id: int, edited_at, email: str, name: str, last_name: str, vk_id: int) -> None:
@@ -81,10 +86,22 @@ def create_subject_course(subject_id: int, course_id: int) -> None:
     """, subject_id, course_id)
 
 
-def create_structure(id: int, name: str) -> None:
+def create_subject_course_with_id(id: int, subject_id: int, course_id: int) -> None:
     run_query("""
-        INSERT INTO structure(id, name) VALUES ($1, $2);
-    """, id, name)
+        INSERT INTO subject_course(id, subject_id, course_id) VALUES ($1, $2, $3)
+    """, id, subject_id, course_id)
+
+
+def create_subject_course_lead(account_teacher_id: int, subject_course_id: int) -> None:
+    run_query("""
+            INSERT INTO subject_course_lead(account_teacher_id, subject_course_id) VALUES ($1, $2)
+        """, account_teacher_id, subject_course_id)
+
+
+def create_subject_course_subscribed(account_student_id: int, subject_course_id: int) -> None:
+    run_query("""
+            INSERT INTO subject_course_subscription(account_student_id, subject_course_id) VALUES ($1, $2)
+        """, account_student_id, subject_course_id)
 
 
 def create_lesson(

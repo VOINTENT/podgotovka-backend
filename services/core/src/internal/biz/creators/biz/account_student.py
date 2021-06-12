@@ -10,10 +10,17 @@ from src.internal.biz.entities.request.account.student.add import AccountStudent
 
 class AccountStudentCreator(CreatorBiz):
     def get_from_record(self, record: Record):
+        photo = Photo(short_url=record.get('account_photo_link')) if 'account_photo_link' in record else None
         return AccountStudent(
             id=record.get('account_student_id'),
             hash_password=record.get('account_hash_password'),
-            email=record.get('account_email')
+            email=record.get('account_email'),
+            name=record.get('account_name'),
+            last_name=record.get('account_last_name'),
+            middle_name=record.get('account_middle_name'),
+            description=record.get('account_description'),
+            photo=photo,
+            vk_id=record.get('account_student_vk_id'),
         )
 
     def get_from_record_many(self, records: List[Record]):

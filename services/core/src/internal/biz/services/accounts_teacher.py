@@ -22,3 +22,7 @@ class AccountsTeacherService:
     @staticmethod
     async def get_by_id_simple(account_teacher_id: int) -> Optional[AccountTeacher]:
         return await AccountTeacherDao().get_by_id(account_teacher_id)
+
+    @staticmethod
+    async def get_by_id_detail(account_teacher_id: int) -> AccountTeacher:
+        return await AccountTeacherDao().get_detail_by_id(account_teacher_id)
