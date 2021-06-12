@@ -216,4 +216,4 @@ def test_get_lessons_names(client: TestClient, truncate, account_teacher, course
 
     response_json = response.json()
     assert len(response_json) == 1
-    assert_lesson_only_name_response(response_json, id=TestLessonData2.id, name=TestLessonData2.name)
+    assert_lesson_only_name_response(response_json[0], id=TestLessonData2.id, name=TestLessonData2.name)

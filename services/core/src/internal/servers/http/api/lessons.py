@@ -88,7 +88,7 @@ async def get_lesson_detail_for_edit(lesson_id: int,
     return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
 
 
-@lessons_router.get('/simple', response_model=LessonOnlyNameResponse)
+@lessons_router.get('/simple', response_model=List[LessonOnlyNameResponse])
 async def get_lessons_names(course_id: int = Depends(get_course_id),
                             subject_id: int = Depends(get_subject_id),
                             pagination_params: PaginationParams = Depends()):
