@@ -7,7 +7,7 @@ from src.internal.biz.creators.response.subjet_course_simple import SubjectCours
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.biz.subject import Subject
-from src.internal.biz.entities.biz.subject_course import SubjectCourse
+
 from src.internal.biz.entities.response.subject.simple import SubjectSimpleResponse
 from src.internal.biz.entities.response.subject.subject_course_simple import SubjectCourseSimpleResponse
 from src.internal.biz.services.subjects import SubjectsService
@@ -27,7 +27,7 @@ async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_
 
 @subjects_router.get('/my/teachers/lead', response_model=List[SubjectCourseSimpleResponse])
 async def get_my_teacher_subjects_lead(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
-                                       pagination_params: PaginationParams = Depends()) -> List[SubjectCourse]:
+                                       pagination_params: PaginationParams = Depends()):
     subject_courses = await SubjectsService.get_lead_for_teacher(pagination_params.limit,
                                                                  pagination_params.skip,
                                                                  account_teacher.id)
@@ -44,7 +44,7 @@ async def get_my_student_subjects(account_student: AccountStudent = Depends(get_
 
 @subjects_router.get('/my/students/subscribed', response_model=List[SubjectCourseSimpleResponse])
 async def get_my_student_subjects_subscribed(account_student: AccountStudent = Depends(get_current_account_student),
-                                             pagination_params: PaginationParams = Depends()) -> List[SubjectCourse]:
+                                             pagination_params: PaginationParams = Depends()):
     subject_courses = await SubjectsService.get_subscribed_for_student(pagination_params.limit,
                                                                        pagination_params.skip,
                                                                        account_student.id)

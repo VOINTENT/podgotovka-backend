@@ -24,14 +24,6 @@ class SubjectDao(BaseDao):
         rows = await self.fetchall(query)
         return SubjectCreator.get_from_record_many(rows)
 
-    @staticmethod
-    def _get_simple_fields() -> List[Any]:
-        return [subject_table.c.id.label('subject_id'), subject_table.c.name.label('subject_name')]
-
-    @staticmethod
-    def _add_pagination(query: Select, limit: int = 1_000_000, offset: int = 0) -> Select:
-        return query.limit(limit).offset(offset)
-
     async def get_teacher_lead(self, limit: int, offset: int, account_teacher_id: int):
         select_from = self.__class__._add_select_from_with_join_lead()
         select_from = self.__class__._add_join_subject_course(select_from)
@@ -59,6 +51,14 @@ class SubjectDao(BaseDao):
         rows = await self.fetchall(query)
 
         return SubjectCourseCreator.get_from_record_many(rows)
+
+    @staticmethod
+    def _get_simple_fields() -> List[Any]:
+        return [subject_table.c.id.label('subject_id'), subject_table.c.name.label('subject_name')]
+
+    @staticmethod
+    def _add_pagination(query: Select, limit: int = 1_000_000, offset: int = 0) -> Select:
+        return query.limit(limit).offset(offset)
 
     @staticmethod
     def _add_select_from_with_join_lead() -> Select:

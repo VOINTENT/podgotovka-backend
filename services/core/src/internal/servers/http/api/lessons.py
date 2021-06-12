@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends
 
 from src.internal.biz.creators.response.just_id import JustIdResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_edit import LessonDetailForEditResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
+from src.internal.biz.creators.response.lesson_only_name import LessonOnlyNameResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
@@ -87,11 +88,14 @@ async def get_lesson_detail_for_edit(lesson_id: int,
     return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
 
 
-@lessons_router.get('/teachers/simple', response_model=LessonOnlyNameResponse)
-async def get_lessons_names(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
-                            course_id: int = Depends(get_course_id),
-                            subject_id: int = Depends(get_subject_id)):
-    pass
+@lessons_router.get('/simple', response_model=List[LessonOnlyNameResponse])
+async def get_lessons_names(course_id: int = Depends(get_course_id),
+                            subject_id: int = Depends(get_subject_id),
+                            pagination_params: PaginationParams = Depends()):
+    lessons: List[Lesson] = await LessonService.get_lessons_names(course_id=course_id, subject_id=subject_id,
+                                                                  limit=pagination_params.limit,
+                                                                  skip=pagination_params.skip)
+    return LessonOnlyNameResponseCreator.get_many_from_lessons(lessons)
 
 
 @lessons_router.post('/{lesson_id}/watched', response_model=bool)

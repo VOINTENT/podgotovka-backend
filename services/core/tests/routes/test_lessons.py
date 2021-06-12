@@ -6,7 +6,7 @@ from tests.test_data import TestLessonData, TestLessonData2, TestLessonFileData,
     TestAccountTeacherData, TestSubjectData, TestCourseData
 from tests.utils.asserts.db.lesson import assert_lesson_in_db
 from tests.utils.asserts.models.lesson import assert_lesson_simple_list_with_counts_response, \
-    assert_lesson_detail_for_student_response, assert_lesson_detail_for_edit_response
+    assert_lesson_detail_for_student_response, assert_lesson_detail_for_edit_response, assert_lesson_only_name_response
 from tests.utils.db import run_query
 from tests.utils.utils import get_auth_headers, get_random_json, get_random_str
 
@@ -208,3 +208,12 @@ def test_update_status(client: TestClient, truncate, access_token_teacher, cours
 
     status = run_query("""SELECT status FROM lesson WHERE id = $1""", TestLessonData2.id)[0][0]
     assert status == 'published'
+
+
+def test_get_lessons_names(client: TestClient, truncate, account_teacher, courses, subjects, lesson2):
+    response = client.get(f'/core/v1/lessons/simple')
+    assert response.status_code == 200
+
+    response_json = response.json()
+    assert len(response_json) == 1
+    assert_lesson_only_name_response(response_json[0], id=TestLessonData2.id, name=TestLessonData2.name)
