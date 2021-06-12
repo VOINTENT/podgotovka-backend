@@ -5,6 +5,7 @@ from src.internal.biz.creators.biz.lesson import LessonCreator
 from src.internal.biz.creators.biz.lesson_with_counts import LessonWithCountsCreator
 from src.internal.biz.dao.lesson import LessonDao
 from src.internal.biz.entities.biz.lesson import Lesson
+from src.internal.biz.entities.enum.lesson_status import LessonStatusEnum
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.servers.http.exceptions.lesson import LessonExceptionEnum
 from src.internal.biz.entities.enum.order import OrderEnum
@@ -80,6 +81,12 @@ class LessonService:
         return LessonWithCountsCreator.get_from_args(lessons=lessons, count_last=count_last, count_next=count_next)
 
     @staticmethod
+    async def get_lessons_names(course_id: int, subject_id: int, limit: int, skip: int) -> List[Lesson]:
+        lessons: List[Lesson] = await LessonDao().get_names(course_id=course_id, subject_id=subject_id, limit=limit,
+                                                            offset=skip)
+        return lessons
+
+    @staticmethod
     async def _get_counts_other_lessons(lessons: List[Lesson], course_id: Optional[int], subject_id: Optional[int],
                                         account_teacher_id: Optional[int]) -> Tuple[int, int]:
         if not lessons:
@@ -92,3 +99,19 @@ class LessonService:
         count_next = await LessonDao().get_count_next(max_created_at, course_id=course_id, subject_id=subject_id,
                                                       account_teacher_id=account_teacher_id)
         return count_last, count_next
+
+    @staticmethod
+    async def update_lesson_status(lesson_id: int, lesson_status: LessonStatusEnum,
+                                   auth_account_teacher_id: int) -> None:
+        owner_account_teacher_id = await LessonDao().get_owner_account_teacher_id(lesson_id)
+        if not owner_account_teacher_id:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        if owner_account_teacher_id != auth_account_teacher_id:
+            raise LessonExceptionEnum.LESSON_DOESNT_EXIST
+
+        if lesson_status == LessonStatusEnum.published:
+            lesson: Lesson = await LessonDao().get_with_files(lesson_id)
+            lesson.validate()
+
+        await LessonDao().update_status(lesson_id, lesson_status)

@@ -1,17 +1,19 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends
 
 from src.internal.biz.creators.response.just_id import JustIdResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_edit import LessonDetailForEditResponseCreator
 from src.internal.biz.creators.response.lesson_detail_for_student_response import LessonDetailForStudentResponseCreator
+from src.internal.biz.creators.response.lesson_only_name import LessonOnlyNameResponseCreator
 from src.internal.biz.creators.response.lessons_simple_with_counts import LessonSimpleListWithCountsResponseCreator
 from src.internal.biz.entities.biz.account.account_student import AccountStudent
 from src.internal.biz.entities.biz.account.account_teacher import AccountTeacher
 from src.internal.biz.entities.biz.lesson import Lesson
 from src.internal.biz.entities.enum.order import OrderEnum
 from src.internal.biz.entities.lessons_with_counts import LessonsWithCounts
+from src.internal.biz.entities.request.lesson.status import LessonStatusUpdateRequest
 from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 from src.internal.biz.entities.response.common.just_id import JustIdResponse
 from src.internal.biz.entities.response.lesson.detail_for_edit import LessonDetailForEditResponse
@@ -86,11 +88,14 @@ async def get_lesson_detail_for_edit(lesson_id: int,
     return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
 
 
-@lessons_router.get('/teachers/simple', response_model=LessonOnlyNameResponse)
-async def get_lessons_names(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
-                            course_id: int = Depends(get_course_id),
-                            subject_id: int = Depends(get_subject_id)):
-    pass
+@lessons_router.get('/simple', response_model=LessonOnlyNameResponse)
+async def get_lessons_names(course_id: int = Depends(get_course_id),
+                            subject_id: int = Depends(get_subject_id),
+                            pagination_params: PaginationParams = Depends()):
+    lessons: List[Lesson] = await LessonService.get_lessons_names(course_id=course_id, subject_id=subject_id,
+                                                                  limit=pagination_params.limit,
+                                                                  skip=pagination_params.skip)
+    return LessonOnlyNameResponseCreator.get_many_from_lessons(lessons)
 
 
 @lessons_router.post('/{lesson_id}/watched', response_model=bool)
@@ -122,3 +127,11 @@ async def lesson_update(lesson_id: int,
                         account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
     lesson = await LessonService.update_lesson(lesson_id, lesson_request, account_teacher.id)
     return LessonDetailForEditResponseCreator.get_from_lesson(lesson)
+
+
+@lessons_router.patch('/{lesson_id}/status', response_model=bool)
+async def update_status(lesson_id: int,
+                        status_request: LessonStatusUpdateRequest,
+                        account_teacher: AccountTeacher = Depends(get_current_account_teacher)):
+    await LessonService.update_lesson_status(lesson_id, status_request.status, account_teacher.id)
+    return True

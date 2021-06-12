@@ -209,6 +209,28 @@ class LessonDao(BaseDao):
         rows = await self.fetchall(query)
         return DocumentCreator.get_many_from_record(rows)
 
+    async def get_owner_account_teacher_id(self, lesson_id) -> Optional[int]:
+        query = select([lesson_table.c.account_teacher_id]).select_from(
+            lesson_table).where(lesson_table.c.id == lesson_id)
+
+        account_teacher_id = await self.fetchval(query)
+        return account_teacher_id
+
+    async def update_status(self, lesson_id: int, status: LessonStatusEnum) -> None:
+        query = lesson_table.update().values(status=status).where(lesson_table.c.id == lesson_id)
+        await self.execute(query)
+
+    async def get_names(self, subject_id: int, course_id: int, limit: int, offset: int) -> List[Lesson]:
+        query = select([
+            lesson_table.c.id.label('lesson_id'), lesson_table.c.name.label('lesson_name')
+        ]).select_from(lesson_table)
+        query = self.__class__._add_is_published_condition(query)
+        query = self.__class__._add_conditions(query, course_id=course_id, subject_id=subject_id)
+        query = self.__class__._add_pagination(query, limit=limit, offset=offset)
+
+        rows = await self.fetchall(query)
+        return LessonCreator.get_from_record_many(rows)
+
     @staticmethod
     def _add_select_from_joined(account_student_id: int) -> Select:
         return lesson_table. \

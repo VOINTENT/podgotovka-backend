@@ -66,3 +66,8 @@ def assert_lesson_detail_for_edit_response(
     assert_time(time_finish, response['time_finish'])
     for file_simple_response, file in zip(response['files'], files):
         assert_file_simple_response(file_simple_response, name=file[0], file_link=file[1])
+
+
+def assert_lesson_only_name_response(response: Dict[str, Any], id: int, name: str):
+    assert response['id'] == id
+    assert response['name'] == name

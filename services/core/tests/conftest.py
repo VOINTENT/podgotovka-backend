@@ -90,7 +90,6 @@ def access_token_student(account_student, client: TestClient):
 def access_token_student_vk(account_student_vk, client: TestClient):
     response = client.post('/core/v1/accounts-student/auth/vk', json={
         'code': TestAccountStudentVkData.vk_code
-
     })
     return response.json()['access_token']
 

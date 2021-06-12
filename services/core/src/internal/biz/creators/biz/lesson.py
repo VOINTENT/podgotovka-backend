@@ -18,8 +18,8 @@ from src.internal.biz.entities.request.lesson.update import LessonUpdateRequest
 class LessonCreator(CreatorBiz):
     @staticmethod
     def get_from_record(record: Record):
-        course = CourseCreator.get_from_record(record)
-        subject = SubjectCreator.get_from_record(record)
+        course = CourseCreator.get_from_record(record) if record.get('course_id') else None
+        subject = SubjectCreator.get_from_record(record) if record.get('subject_id') else None
         return Lesson(
             id=record.get('lesson_id'),
             name=record.get('lesson_name'),
