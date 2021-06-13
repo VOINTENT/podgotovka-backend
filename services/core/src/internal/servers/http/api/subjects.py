@@ -18,11 +18,13 @@ from src.internal.servers.http.depends.pagination import PaginationParams
 subjects_router = APIRouter(prefix='/subjects', tags=['Subjects'])
 
 
-@subjects_router.get('/my/teachers/', response_model=List[SubjectSimpleResponse])
+@subjects_router.get('/my/teachers', response_model=List[SubjectSimpleResponse])
 async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
                                   pagination_params: PaginationParams = Depends(),
                                   course_id: int = Depends(get_course_id)):
-    pass
+    subjects = await SubjectsService.get_teacher_subjects(limit=pagination_params.limit, skip=pagination_params.skip,
+                                                          course_id=course_id, account_teacher_id=account_teacher.id)
+    return SubjectSimpleResponseCreator.get_many_from_subjects(subjects)
 
 
 @subjects_router.get('/my/teachers/lead', response_model=List[SubjectCourseSimpleResponse])
