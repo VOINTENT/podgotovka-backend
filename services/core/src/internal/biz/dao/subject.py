@@ -6,6 +6,7 @@ from sqlalchemy.sql import Select
 from src.internal.biz.creators.biz.subject import SubjectCreator
 from src.internal.biz.creators.biz.subject_course import SubjectCourseCreator
 from src.internal.biz.dao.base import BaseDao
+from src.internal.biz.entities.biz.subject import Subject
 from src.schema.meta import subject_table, subject_course_table, course_table, \
     subject_course_lead_table, subject_course_subscription_table
 
@@ -31,7 +32,7 @@ class SubjectDao(BaseDao):
         query = select(self.__class__._get_select_subject_course()). \
             select_from(select_from). \
             where(subject_course_lead_table.c.account_teacher_id == account_teacher_id). \
-            group_by(course_table.c.id, subject_table.c.id)
+            group_by(course_table.c.id, subject_table.c.id).order_by(course_table.c.created_at)
         query = self.__class__._add_pagination(query, limit, offset)
 
         rows = await self.fetchall(query)
@@ -42,15 +43,42 @@ class SubjectDao(BaseDao):
         select_from = self.__class__._add_select_from_with_join_subscribed()
         select_from = self.__class__._add_join_subject_course(select_from)
 
-        query = select(self.__class__._get_select_subject_course()). \
-            select_from(select_from). \
-            where(subject_course_subscription_table.c.account_student_id == account_student_id). \
-            group_by(course_table.c.id, subject_table.c.id)
+        query = select(
+            self.__class__._get_select_subject_course()
+        ).select_from(
+            select_from
+        ).where(
+            subject_course_subscription_table.c.account_student_id == account_student_id
+        ).group_by(
+            course_table.c.id, subject_table.c.id, subject_table.c.name, course_table.c.id
+        ).order_by(subject_table.c.created_at)
         query = self.__class__._add_pagination(query, limit, offset)
 
         rows = await self.fetchall(query)
 
         return SubjectCourseCreator.get_from_record_many(rows)
+
+    async def get_teacher_subjects(self, limit: int, offset: int, account_teacher_id: int, course_id: Optional[int]
+                                   ) -> List[Subject]:
+        query = select([
+            subject_table.c.id.label('subject_id'),
+            subject_table.c.name.label('subject_name')
+        ]).select_from(
+            subject_table.join(subject_course_table.join(subject_course_lead_table))
+        ).where(
+            subject_course_lead_table.c.account_teacher_id == account_teacher_id
+        ).group_by(
+            subject_table.c.id,
+            subject_table.c.name
+        ).order_by(subject_table.c.id)
+
+        if course_id:
+            query = query.where(subject_course_table.c.course_id == course_id)
+
+        query = self.__class__._add_pagination(query, limit=limit, offset=offset)
+
+        rows = await self.fetchall(query)
+        return SubjectCreator.get_from_record_many(rows)
 
     @staticmethod
     def _get_simple_fields() -> List[Any]:

@@ -1,3 +1,5 @@
+from typing import List
+
 from asyncpg import Record
 
 from src.internal.biz.creators.biz.base import CreatorBiz
@@ -15,3 +17,7 @@ class SubjectCreator(CreatorBiz):
     @staticmethod
     def get_from_request(subject_id: int) -> Subject:
         return Subject(id=subject_id)
+
+    @classmethod
+    def get_from_record_many(cls, records: List[Record]) -> List[Subject]:
+        return super().get_from_record_many(records)
