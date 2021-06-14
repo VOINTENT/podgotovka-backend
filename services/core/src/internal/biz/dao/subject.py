@@ -1,6 +1,6 @@
 from typing import Optional, List, Any
 
-from sqlalchemy import select, and_, func
+from sqlalchemy import select, and_
 from sqlalchemy.sql import Select
 
 from src.internal.biz.creators.biz.subject import SubjectCreator
