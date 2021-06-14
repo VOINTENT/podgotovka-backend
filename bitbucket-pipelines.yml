@@ -38,6 +38,7 @@ pipelines:
            - echo 'Running tests...'
            - pytest services/core/tests -vs
 
+
           services:
             - postgres
 
