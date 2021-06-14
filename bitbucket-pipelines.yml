@@ -14,7 +14,7 @@ definitions:
 
 pipelines:
   pull-requests:
-    '**':
+    develop:
       - step:
           name: Primary testing and linting
           script:
