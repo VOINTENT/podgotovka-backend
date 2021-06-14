@@ -47,8 +47,8 @@ def test_get_lessons_filters(client: TestClient, truncate, account_teacher, cour
 
     response = client.get(f'/core/v1/lessons?course_id={TestLessonData2.course.id}')
     assert response.status_code == 200
-    assert len(response.json()['lessons']) == 1
-    assert response.json()['lessons'][0]['id'] == TestLessonData2.id
+    assert len(response.json()['lessons']) == 2
+    assert response.json()['lessons'][0]['id'] == TestLessonData.id
 
 
 def test_get_lessons_order(client: TestClient, truncate, account_teacher, courses, subjects, homework,
@@ -212,6 +212,15 @@ def test_update_status(client: TestClient, truncate, access_token_teacher, cours
 
 def test_get_lessons_names(client: TestClient, truncate, account_teacher, courses, subjects, lesson2):
     response = client.get(f'/core/v1/lessons/simple')
+    assert response.status_code == 200
+
+    response_json = response.json()
+    assert len(response_json) == 1
+    assert_lesson_only_name_response(response_json[0], id=TestLessonData2.id, name=TestLessonData2.name)
+
+
+def test_get_lessons_names_filter(client: TestClient, truncate, account_teacher, courses, subjects, lesson2):
+    response = client.get(f'/core/v1/lessons/simple?search=%s' % (TestLessonData2.name[:5].upper()))
     assert response.status_code == 200
 
     response_json = response.json()

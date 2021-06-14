@@ -220,12 +220,14 @@ class LessonDao(BaseDao):
         query = lesson_table.update().values(status=status).where(lesson_table.c.id == lesson_id)
         await self.execute(query)
 
-    async def get_names(self, subject_id: int, course_id: int, limit: int, offset: int) -> List[Lesson]:
+    async def get_names(self, subject_id: int, course_id: int, limit: int, offset: int, lesson_search: Optional[str]
+                        ) -> List[Lesson]:
         query = select([
             lesson_table.c.id.label('lesson_id'), lesson_table.c.name.label('lesson_name')
         ]).select_from(lesson_table)
         query = self.__class__._add_is_published_condition(query)
-        query = self.__class__._add_conditions(query, course_id=course_id, subject_id=subject_id)
+        query = self.__class__._add_conditions(query, course_id=course_id, subject_id=subject_id,
+                                               lesson_search=lesson_search)
         query = self.__class__._add_pagination(query, limit=limit, offset=offset)
 
         rows = await self.fetchall(query)
@@ -283,13 +285,10 @@ class LessonDao(BaseDao):
         return query.where(lesson_table.c.status == LessonStatusEnum.published)
 
     @staticmethod
-    def _add_pagination(query: Select, limit: int, offset: int) -> Select:
-        return query.limit(limit).offset(offset)
-
-    @staticmethod
     def _add_conditions(query: Select, date_start: Optional[datetime.datetime] = None,
                         date_finish: Optional[datetime.datetime] = None, course_id: Optional[int] = None,
-                        subject_id: Optional[int] = None, account_teacher_id: Optional[int] = None) -> Select:
+                        subject_id: Optional[int] = None, account_teacher_id: Optional[int] = None,
+                        lesson_search: Optional[str] = None) -> Select:
         if date_start:
             query = query.where(lesson_table.c.time_start >= date_start)
 
@@ -304,6 +303,9 @@ class LessonDao(BaseDao):
 
         if account_teacher_id:
             query = query.where(lesson_table.c.account_teacher_id == account_teacher_id)
+
+        if lesson_search:
+            query = query.where(lesson_table.c.name.ilike(f'%{lesson_search}%'))
 
         return query
 

@@ -1,6 +1,7 @@
 from starlette.testclient import TestClient
 
-from tests.test_data import TestSubjectData, TestSubjectData2, TestCourseData, TestSubjectCourseData3, TestCourseData2
+from tests.test_data import TestSubjectData, TestSubjectData2, TestCourseData, TestSubjectCourseData3, TestCourseData2, \
+    TestLessonData, TestLessonData2
 from tests.utils.asserts.models.subject import assert_subject_simple_response, assert_subject_course_simple_response
 from tests.utils.utils import get_auth_headers
 
@@ -39,6 +40,18 @@ def test_get_teacher_lead(client: TestClient, truncate, subjects, courses, subje
     assert_subject_course_simple_response(result[0], name='%s (%s)' % (TestSubjectData.name, TestCourseData.name),
                                           subject_id=TestSubjectData.id, course_id=TestCourseData.id)
     assert_subject_course_simple_response(result[1], name='%s (%s)' % (TestSubjectData2.name, TestCourseData.name),
+                                          subject_id=TestSubjectData2.id, course_id=TestCourseData.id)
+
+
+def test_get_teacher_lead_filter(client: TestClient, truncate, subjects, courses, subject_course_with_id,
+                                 access_token_teacher, subject_course_lead, lesson2):
+    response = client.get(f'/core/v1/subjects/my/teachers/lead?search=%s' % (TestLessonData2.name.lower()[:5]),
+                          headers=get_auth_headers(access_token_teacher))
+    assert response.status_code == 200
+
+    result = response.json()
+    assert len(result) == 1
+    assert_subject_course_simple_response(result[0], name='%s (%s)' % (TestSubjectData2.name, TestCourseData.name),
                                           subject_id=TestSubjectData2.id, course_id=TestCourseData.id)
 
 
