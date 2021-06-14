@@ -20,7 +20,9 @@ async def get_my_teacher_courses(
         pagination_params: PaginationParams = Depends(),
         subject_id: int = Depends(get_subject_id)
 ):
-    pass
+    courses = await CoursesService.get_teacher_courses(limit=pagination_params.limit, skip=pagination_params.skip,
+                                                       subject_id=subject_id, account_teacher_id=account_teacher.id)
+    return CourseSimpleResponseCreator.get_many_from_courses(courses)
 
 
 @courses_router.get('/my/students', response_model=CourseSimpleResponse)
