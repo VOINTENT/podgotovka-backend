@@ -14,7 +14,7 @@ from src.internal.servers.http.depends.pagination import PaginationParams
 courses_router = APIRouter(prefix='/courses', tags=['Courses'])
 
 
-@courses_router.get('/my/teachers', response_model=CourseSimpleResponse)
+@courses_router.get('/my/teachers', response_model=List[CourseSimpleResponse])
 async def get_my_teacher_courses(
         account_teacher: AccountTeacher = Depends(get_current_account_teacher),
         pagination_params: PaginationParams = Depends(),

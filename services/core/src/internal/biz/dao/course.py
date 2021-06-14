@@ -29,7 +29,7 @@ class CourseDao(BaseDao):
             course_table.join(subject_course_table.join(subject_course_lead_table))
         ).where(
             subject_course_lead_table.c.account_teacher_id == account_teacher_id
-        ).order_by(
+        ).group_by(
             course_table.c.id,
             course_table.c.name
         ).order_by(
