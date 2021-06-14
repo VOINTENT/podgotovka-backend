@@ -13,6 +13,15 @@ definitions:
         POSTGRES_PASSWORD: $PODGOTOVKA_DB_PASSWORD
 
 pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Primary testing and linting
+          script:
+            - pytest services/core/tests -vs
+          services:
+            - postgres
+
   branches:
     develop:
       - step:
@@ -85,4 +94,4 @@ pipelines:
             - title_message=$($git_log --pretty=format:"%s")
             - text_message=$($git_log --pretty=format:"%b")
             - pip3 install -r ./helpers/notifier/requirements.txt
-            - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#36a64f"
+#            - python3 ./helpers/notifier/app.py "$SLACK_API_TOKEN" "proj-podgotovka" "$author_name" "$title_message" "$text_message" "#36a64f"
