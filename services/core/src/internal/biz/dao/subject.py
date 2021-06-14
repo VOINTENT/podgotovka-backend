@@ -32,7 +32,7 @@ class SubjectDao(BaseDao):
         query = select(self.__class__._get_select_subject_course()). \
             select_from(select_from). \
             where(subject_course_lead_table.c.account_teacher_id == account_teacher_id). \
-            group_by(course_table.c.id, subject_table.c.id).order_by(course_table.c.created_at)
+            group_by(course_table.c.id, subject_table.c.id).order_by(subject_table.c.created_at)
         query = self.__class__._add_pagination(query, limit, offset)
 
         rows = await self.fetchall(query)
@@ -70,7 +70,7 @@ class SubjectDao(BaseDao):
         ).group_by(
             subject_table.c.id,
             subject_table.c.name
-        ).order_by(subject_table.c.id)
+        ).order_by(subject_table.c.created_at)
 
         if course_id:
             query = query.where(subject_course_table.c.course_id == course_id)
