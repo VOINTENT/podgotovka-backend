@@ -13,17 +13,17 @@ definitions:
         POSTGRES_PASSWORD: $PODGOTOVKA_DB_PASSWORD
 
 pipelines:
-  pull-requests:
-    develop:
-      - step:
-          name: Primary testing and linting
-          script:
-            - pytest services/core/tests -vs
-          services:
-            - postgres
-
   branches:
     develop:
+      - parallel:
+          - step:
+            name: Some name
+            script:
+              - Some script
+          - step:
+            name: Some name
+            script:
+              - Some script
       - step:
           name: Testing and linting
           deployment: Test
