@@ -17,13 +17,19 @@ pipelines:
     develop:
       - parallel:
           - step:
-            name: Some name
-            script:
-              - Some script
+              name: Account student tests
+              script:
+               - python3 -V
+               - pip3 install -r ./services/core/requirements.txt
+               - cd services/core && alembic upgrade head && cd ../..
+               - pytest services/core/tests/routes/test_account_student.py -vs
           - step:
-            name: Some name
-            script:
-              - Some script
+              name: Courses tests
+              script:
+               - python3 -V
+               - pip3 install -r ./services/core/requirements.txt
+               - cd services/core && alembic upgrade head && cd ../..
+               - pytest services/core/tests/routes/test_courses.py -vs
       - step:
           name: Testing and linting
           deployment: Test
