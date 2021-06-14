@@ -85,10 +85,6 @@ class SubjectDao(BaseDao):
         return [subject_table.c.id.label('subject_id'), subject_table.c.name.label('subject_name')]
 
     @staticmethod
-    def _add_pagination(query: Select, limit: int = 1_000_000, offset: int = 0) -> Select:
-        return query.limit(limit).offset(offset)
-
-    @staticmethod
     def _add_select_from_with_join_lead() -> Select:
         return subject_course_lead_table. \
             join(subject_course_table, subject_course_table.c.id == subject_course_lead_table.c.subject_course_id)
