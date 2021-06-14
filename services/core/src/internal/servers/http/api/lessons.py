@@ -26,7 +26,7 @@ from src.internal.biz.services.lesson import LessonService
 from src.internal.servers.http.depends.auth import get_current_account_student, get_optional_current_account_student, \
     get_current_account_teacher
 from src.internal.servers.http.depends.filters import get_date_start, get_order, get_course_id, get_subject_id, \
-    get_date_finish
+    get_date_finish, get_search
 from src.internal.servers.http.depends.pagination import PaginationParams
 
 lessons_router = APIRouter(prefix='/lessons', tags=['Lessons'])
@@ -91,10 +91,11 @@ async def get_lesson_detail_for_edit(lesson_id: int,
 @lessons_router.get('/simple', response_model=List[LessonOnlyNameResponse])
 async def get_lessons_names(course_id: int = Depends(get_course_id),
                             subject_id: int = Depends(get_subject_id),
-                            pagination_params: PaginationParams = Depends()):
-    lessons: List[Lesson] = await LessonService.get_lessons_names(course_id=course_id, subject_id=subject_id,
-                                                                  limit=pagination_params.limit,
-                                                                  skip=pagination_params.skip)
+                            pagination_params: PaginationParams = Depends(),
+                            lesson_search: Optional[str] = Depends(get_search)):
+    lessons: List[Lesson] = await LessonService.get_lessons_names(
+        course_id=course_id, subject_id=subject_id, limit=pagination_params.limit, skip=pagination_params.skip,
+        lesson_search=lesson_search)
     return LessonOnlyNameResponseCreator.get_many_from_lessons(lessons)
 
 

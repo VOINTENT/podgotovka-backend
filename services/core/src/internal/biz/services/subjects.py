@@ -11,8 +11,9 @@ class SubjectsService:
         return await SubjectDao().get_all_subjects(limit=limit, offset=skip, course_id=course_id)
 
     @staticmethod
-    async def get_lead_for_teacher(limit: int, skip: int, account_teacher_id: int) -> List[SubjectCourse]:
-        return await SubjectDao().get_teacher_lead(limit, skip, account_teacher_id)
+    async def get_lead_for_teacher(limit: int, skip: int, account_teacher_id: int, lesson_search: Optional[str]
+                                   ) -> List[SubjectCourse]:
+        return await SubjectDao().get_teacher_lead(limit, skip, account_teacher_id, lesson_search=lesson_search)
 
     @staticmethod
     async def get_subscribed_for_student(limit: int, skip: int, account_student_id: int) -> List[SubjectCourse]:

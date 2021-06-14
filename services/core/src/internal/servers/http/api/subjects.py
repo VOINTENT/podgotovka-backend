@@ -12,7 +12,7 @@ from src.internal.biz.entities.response.subject.simple import SubjectSimpleRespo
 from src.internal.biz.entities.response.subject.subject_course_simple import SubjectCourseSimpleResponse
 from src.internal.biz.services.subjects import SubjectsService
 from src.internal.servers.http.depends.auth import get_current_account_teacher, get_current_account_student
-from src.internal.servers.http.depends.filters import get_course_id
+from src.internal.servers.http.depends.filters import get_course_id, get_search
 from src.internal.servers.http.depends.pagination import PaginationParams
 
 subjects_router = APIRouter(prefix='/subjects', tags=['Subjects'])
@@ -29,10 +29,10 @@ async def get_my_teacher_subjects(account_teacher: AccountTeacher = Depends(get_
 
 @subjects_router.get('/my/teachers/lead', response_model=List[SubjectCourseSimpleResponse])
 async def get_my_teacher_subjects_lead(account_teacher: AccountTeacher = Depends(get_current_account_teacher),
-                                       pagination_params: PaginationParams = Depends()):
-    subject_courses = await SubjectsService.get_lead_for_teacher(pagination_params.limit,
-                                                                 pagination_params.skip,
-                                                                 account_teacher.id)
+                                       pagination_params: PaginationParams = Depends(),
+                                       lesson_search: Optional[str] = Depends(get_search)):
+    subject_courses = await SubjectsService.get_lead_for_teacher(
+        pagination_params.limit, pagination_params.skip, account_teacher.id, lesson_search=lesson_search)
 
     return SubjectCourseSimpleResponseCreator.get_from_many(subject_courses)
 

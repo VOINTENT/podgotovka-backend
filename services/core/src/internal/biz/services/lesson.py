@@ -81,9 +81,9 @@ class LessonService:
         return LessonWithCountsCreator.get_from_args(lessons=lessons, count_last=count_last, count_next=count_next)
 
     @staticmethod
-    async def get_lessons_names(course_id: int, subject_id: int, limit: int, skip: int) -> List[Lesson]:
-        lessons: List[Lesson] = await LessonDao().get_names(course_id=course_id, subject_id=subject_id, limit=limit,
-                                                            offset=skip)
+    async def get_lessons_names(course_id: int, subject_id: int, limit: int, skip: int, lesson_search: Optional[str]) -> List[Lesson]:
+        lessons: List[Lesson] = await LessonDao().get_names(
+            course_id=course_id, subject_id=subject_id, limit=limit, offset=skip, lesson_search=lesson_search)
         return lessons
 
     @staticmethod

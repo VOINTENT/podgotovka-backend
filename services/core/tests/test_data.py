@@ -148,7 +148,7 @@ class TestLessonData2:
     text = get_random_json()
     status = 'published'
     subject = TestSubjectData2
-    course = TestCourseData2
+    course = TestCourseData
     homework_id = None
     account_teacher_id = TestAccountTeacherData.id
     is_watched = False

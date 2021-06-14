@@ -24,3 +24,7 @@ def get_course_id(course_id: Optional[int] = Query(None)):
 
 def get_subject_id(subject_id: Optional[int] = Query(None)):
     return subject_id
+
+
+def get_search(search: Optional[str] = Query(None)):
+    return search.lower() if search else None
